@@ -6,7 +6,7 @@ lazy val common = Seq(
   version := "0.1.0-SNAPSHOT"
 )
 
-lazy val data = (project in file(".")).
+lazy val esoBuild = (project in file("eso-build")).
   settings(
     common,
     name := "eso-build",
