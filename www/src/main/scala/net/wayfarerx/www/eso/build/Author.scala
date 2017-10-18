@@ -1,3 +1,3 @@
-package net.wayfarerx.eso.build
+package net.wayfarerx.www.eso.build
 
 case class Author(name: String, twitter: String)

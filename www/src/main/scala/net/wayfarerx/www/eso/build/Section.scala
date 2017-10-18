@@ -1,4 +1,4 @@
-package net.wayfarerx.eso.build
+package net.wayfarerx.www.eso.build
 
 case class Section(
   title: String,

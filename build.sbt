@@ -6,9 +6,9 @@ lazy val common = Seq(
   version := "0.1.0-SNAPSHOT"
 )
 
-lazy val esoBuild = (project in file("eso-build")).
+lazy val www = (project in file("www")).
   settings(
     common,
-    name := "eso-build",
+    name := "www",
     libraryDependencies += scalaTest % Test
   )

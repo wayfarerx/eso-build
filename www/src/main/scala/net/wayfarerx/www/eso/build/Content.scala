@@ -1,4 +1,6 @@
-package net.wayfarerx.eso.build
+package net.wayfarerx.www.eso.build
+
+import net.wayfarerx.www.Text
 
 sealed trait Content {
 

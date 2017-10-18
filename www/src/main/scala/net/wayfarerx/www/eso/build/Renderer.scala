@@ -1,6 +1,8 @@
-package net.wayfarerx.eso.build
+package net.wayfarerx.www.eso.build
 
 import java.io.PrintWriter
+
+import net.wayfarerx.www.Text
 
 final class Renderer(writer: PrintWriter) {
 
@@ -63,8 +65,8 @@ final class Renderer(writer: PrintWriter) {
   }
 
   private def render(text: Text, lead: Boolean): Unit =
-    if (lead) writer.println(s"""<p class="lead">${text.value}</p>""")
-    else writer.println(s"<p>${text.value}</p>")
+    if (lead) writer.println(s"""<p class="lead">${text}</p>""")
+    else writer.println(s"<p>${text}</p>")
 
   private def render(content: Content): Unit = content match {
     case Content.Image(path) =>
