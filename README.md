@@ -1,2 +1,2 @@
-# eso-build
-ESO build syntax and Jekyll page generator.
+# website
+The projects that define the wayfarerx website. 
