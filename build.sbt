@@ -10,5 +10,6 @@ lazy val www = (project in file("www")).
   settings(
     common,
     name := "www",
+    libraryDependencies += catsEffect,
     libraryDependencies += scalaTest % Test
   )
