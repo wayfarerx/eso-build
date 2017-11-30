@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {% include meta.html %}
+  <style>
+    img.landing
+    {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    @media screen and (orientation: portrait) {
+      img.landing { max-width: 90%; }
+    }
+    @media screen and (orientation: landscape) {
+      img.landing { max-height: 90%; }
+    }
+  </style>
+</head>
+<body>
+  <img src="images/wx.png" alt="wayfarerx logo" class="landing">
+</body>
+</html>

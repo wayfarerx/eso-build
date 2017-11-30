@@ -26,7 +26,16 @@ import language.implicitConversions
 package object www {
 
   /**
-   * Implicitly converts a string to a text content object.
+   * Implicit support for entities as a link to another entity.
+   *
+   * @param entity The entity to link to.
+   * @return A link to the specified entity.
+   */
+  implicit def entityToContentLink(entity: Entity): Content =
+    Link(entity.location, entity.title.toLowerCase)
+
+  /**
+   * Implicit support for strings as text content.
    *
    * @param content The content to represent.
    * @return The new text content object.

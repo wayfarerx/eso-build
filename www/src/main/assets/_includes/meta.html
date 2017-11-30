@@ -1,0 +1,14 @@
+<meta charset="utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>{% if page.title %}{{ page.title }} - {% endif %}{{ site.title }}</title>
+<meta name="description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}"/>
+<meta name="keywords" content="{% if page.title %}{{ page.title }} {% endif %}{{ site.title }}{% if page.description %} {{ page.description }}{% endif %} {{ site.description }}"/>
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:site" content="@{{ site.twitter }}"/>
+<meta name="twitter:creator" content="@{% if page.twitter %}{{ page.twitter }}{% else %}{{ site.twitter }}{% endif %}"/>
+<meta property="og:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}"/>
+<meta property="og:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}"/>
+<meta property="og:image" content="{% if page.image %}{{ page.image }}{% else %}{{ site.image }}{% endif %}"/>
+<meta property="og:image:alt" content="{% if page.image %}{{ page.image-alt }}{% else %}{{ site.image-alt }}{% endif %}"/>
+<link rel="stylesheet" href="/css/wayfarerx.css" />

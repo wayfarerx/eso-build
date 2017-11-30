@@ -1,8 +1,8 @@
-package net.wayfarerx.www.eso.build
+package net.wayfarerx.www
+package eso.build
 
 import java.io.PrintWriter
 
-import net.wayfarerx.www.Text
 
 final class Renderer(writer: PrintWriter) {
 
@@ -22,6 +22,7 @@ final class Renderer(writer: PrintWriter) {
     writer.println("---")
     writer.println()
     // Write the sections.
+    /*
     var remaining = Vector(Section(build.headline,
       if (build.description.isEmpty) Content.Textual(None, build.description)
       else Content.Textual(Some(build.description.head), build.description.tail),
@@ -34,6 +35,7 @@ final class Renderer(writer: PrintWriter) {
       remaining = next.map(_ -> (depth + 1)) ++ remaining.tail
       doLeft = !doLeft
     }
+    */
   }
 
   private def renderLeft(section: Section, depth: Int): Vector[Section] = {
@@ -41,6 +43,8 @@ final class Renderer(writer: PrintWriter) {
     writer.println("""<div class="row">""")
     writer.println("""<div class="col-md-7">""")
     if (depth >= 2) writer.println(s"""<$h>${section.title}</$h>""")
+    ???
+    /*
     render(section.major)
     writer.println("</div")
     writer.println("""<div class="col-md-5">""")
@@ -48,6 +52,7 @@ final class Renderer(writer: PrintWriter) {
     writer.println("</div")
     writer.println("</div>")
     section.subsections
+    */
   }
 
   private def renderRight(section: Section, depth: Int): Vector[Section] = {
@@ -55,6 +60,8 @@ final class Renderer(writer: PrintWriter) {
     writer.println("""<div class="row">""")
     writer.println("""<div class="col-md-7 col-md-push-5">""")
     if (depth >= 2) writer.println(s"""<$h>${section.title}</$h>""")
+    ???
+    /*
     render(section.major)
     writer.println("</div")
     writer.println("""<div class="col-md-5 col-md-pull-7">""")
@@ -62,8 +69,10 @@ final class Renderer(writer: PrintWriter) {
     writer.println("</div")
     writer.println("</div>")
     section.subsections
+    */
   }
 
+  /*
   private def render(text: Text, lead: Boolean): Unit =
     if (lead) writer.println(s"""<p class="lead">${text}</p>""")
     else writer.println(s"<p>${text}</p>")
@@ -75,5 +84,6 @@ final class Renderer(writer: PrintWriter) {
       lead foreach (render(_, true))
       paragraphs foreach (render(_, false))
   }
+  */
 
 }

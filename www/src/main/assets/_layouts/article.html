@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {% include meta.html %}
+</head>
+<body>
+{% include header.html %}
+<main>
+  <article>
+    <header>
+      <h1>{{ page.title }}</h1>
+      <p>{{ page.headline }} by
+        <a href="https://twitter.com/{% if page.twitter %}{{ page.twitter }}{% else %}{{ site.twitter }}{% endif %}">
+          @{% if page.twitter %}{{ page.twitter }}{% else %}{{ site.twitter }}{% endif %}</a></p>
+    </header>
+    {{ content }}
+    {% if page.references %}
+    <footer>
+      Further reading:
+      <ul>{% for pair in page.references %}<li><a href="{{ pair.link }}">{{ pair.text }}</a></li>{% endfor %}</ul>
+    </footer>
+    {% endif %}
+  </article>
+</main>
+{% include footer.html %}
+</body>
+</html>

@@ -23,6 +23,9 @@ package net.wayfarerx.www
  */
 sealed trait Content {
 
+  /** Returns the text of this content without markup. */
+  def stripped: String
+
   /**
    * Appends that content to this content.
    *
@@ -71,7 +74,12 @@ object Content {
  *
  * @param content The content to represent.
  */
-case class Text(content: String) extends Content.Singular
+case class Text(content: String) extends Content.Singular {
+
+  /* Return the content. */
+  override def stripped: String = content
+
+}
 
 /**
  * Represents a unit of content wrapped in <a></a> tags with an optional ID and class list.
@@ -81,7 +89,12 @@ case class Text(content: String) extends Content.Singular
  * @param id      The optional ID to specify on the link tag.
  * @param classes Zero-or-more classes to specify on the link tag.
  */
-case class Link(href: String, content: Content, id: Option[String], classes: Vector[String]) extends Content.Tag
+case class Link(href: String, content: Content, id: Option[String], classes: Vector[String]) extends Content.Tag {
+
+  /* Return the content. */
+  override def stripped: String = content.stripped
+
+}
 
 /**
  * Factory for link content objects.
@@ -121,7 +134,12 @@ object Link {
  * @param id      The optional ID to specify on the image tag.
  * @param classes Zero-or-more classes to specify on the image tag.
  */
-case class Image(src: String, alt: String, id: Option[String], classes: Vector[String]) extends Content.Tag
+case class Image(src: String, alt: String, id: Option[String], classes: Vector[String]) extends Content.Tag {
+
+  /* Return the content. */
+  override def stripped: String = s"($alt)"
+
+}
 
 /**
  * Factory for image content objects.
@@ -154,13 +172,152 @@ object Image {
 }
 
 /**
+ * Represents a unit of content wrapped in <cite></cite> tags with an optional ID and class list.
+ *
+ * @param content The content to wrap with a cite tag.
+ * @param id      The optional ID to specify on the cite tag.
+ * @param classes Zero-or-more classes to specify on the cite tag.
+ */
+case class Cite(content: Content, id: Option[String], classes: Vector[String]) extends Content.Tag {
+
+  /* Return the content. */
+  override def stripped: String = content.stripped
+
+}
+
+/**
+ * Factory for cite content objects.
+ */
+object Cite {
+
+  /**
+   * Creates a new cite content object.
+   *
+   * @param content The content to wrap with a cite tag.
+   * @param classes Zero-or-more classes to specify on the cite tag.
+   * @return The new cite content object.
+   */
+  def apply(content: Content, classes: String*): Cite =
+    Cite(content, None, classes.toVector)
+
+  /**
+   * Creates a new cite content object.
+   *
+   * @param content The content to wrap with a cite tag.
+   * @param id      The optional ID to specify on the cite tag.
+   * @param classes Zero-or-more classes to specify on the cite tag.
+   * @return The new cite content object.
+   */
+  def apply(content: Content, id: Option[String], classes: String*): Cite =
+    Cite(content, id, classes.toVector)
+
+}
+
+/**
+ * Represents a unit of content wrapped in <q></q> tags with an optional ID and class list.
+ *
+ * @param cite    The URL where the content originated.
+ * @param content The content to wrap with a quote tag.
+ * @param id      The optional ID to specify on the quote tag.
+ * @param classes Zero-or-more classes to specify on the quote tag.
+ */
+case class Quote(cite: Option[String], content: Content, id: Option[String], classes: Vector[String])
+  extends Content.Tag {
+
+  /* Return the content. */
+  override def stripped: String = content.stripped
+
+}
+
+/**
+ * Factory for quote content objects.
+ */
+object Quote {
+
+  /**
+   * Creates a new quote content object.
+   *
+   * @param cite    The URL where the content originated.
+   * @param content The content to wrap with a quote tag.
+   * @param classes Zero-or-more classes to specify on the quote tag.
+   * @return The new quote content object.
+   */
+  def apply(cite: Option[String], content: Content, classes: String*): Quote =
+    Quote(cite, content, None, classes.toVector)
+
+  /**
+   * Creates a new quote content object.
+   *
+   * @param cite    The URL where the content originated.
+   * @param content The content to wrap with a quote tag.
+   * @param id      The optional ID to specify on the quote tag.
+   * @param classes Zero-or-more classes to specify on the quote tag.
+   * @return The new quote content object.
+   */
+  def apply(cite: Option[String], content: Content, id: Option[String], classes: String*): Quote =
+    Quote(cite, content, id, classes.toVector)
+
+}
+
+/**
+ * Represents a unit of content wrapped in <blockquote></blockquote> tags with an optional ID and class list.
+ *
+ * @param cite    The URL where the content originated.
+ * @param content The content to wrap with a quote tag.
+ * @param id      The optional ID to specify on the quote tag.
+ * @param classes Zero-or-more classes to specify on the quote tag.
+ */
+case class Blockquote(cite: Option[String], content: Content, id: Option[String], classes: Vector[String])
+  extends Content.Tag {
+
+  /* Return the content. */
+  override def stripped: String = content.stripped
+
+}
+
+/**
+ * Factory for block quote content objects.
+ */
+object Blockquote {
+
+  /**
+   * Creates a new blockquote content object.
+   *
+   * @param cite    The URL where the content originated.
+   * @param content The content to wrap with a block quote tag.
+   * @param classes Zero-or-more classes to specify on the block quote tag.
+   * @return The new block quote content object.
+   */
+  def apply(cite: Option[String], content: Content, classes: String*): Blockquote =
+    Blockquote(cite, content, None, classes.toVector)
+
+  /**
+   * Creates a new quote content object.
+   *
+   * @param cite    The URL where the content originated.
+   * @param content The content to wrap with a block quote tag.
+   * @param id      The optional ID to specify on the block quote tag.
+   * @param classes Zero-or-more classes to specify on the block quote tag.
+   * @return The new block quote content object.
+   */
+  def apply(cite: Option[String], content: Content, id: Option[String], classes: String*): Blockquote =
+    Blockquote(cite, content, id, classes.toVector)
+
+}
+
+/**
  * Represents a unit of content wrapped in <span></span> tags with an optional ID and class list.
  *
  * @param content The content to wrap with a span tag.
  * @param id      The optional ID to specify on the span tag.
  * @param classes Zero-or-more classes to specify on the span tag.
  */
-case class Span(content: Content, id: Option[String], classes: Vector[String]) extends Content.Tag
+case class Span(content: Content, id: Option[String], classes: Vector[String]) extends Content.Tag {
+
+  /* Return the content. */
+  override def stripped: String = content.stripped
+
+}
 
 /**
  * Factory for span content objects.
@@ -197,7 +354,14 @@ object Span {
  * @param id      The optional ID to specify on the ordered tag.
  * @param classes Zero-or-more classes to specify on the ordered tag.
  */
-case class Ordered(content: Vector[Item], id: Option[String], classes: Vector[String]) extends Content.Tag
+case class Ordered(content: Vector[Item], id: Option[String], classes: Vector[String]) extends Content.Tag {
+
+  /* Return the content. */
+  override def stripped: String = ": " + content.zipWithIndex.map {
+    case (item, index) => s"${index + 1} - ${item.stripped}"
+  }.mkString(", ")
+
+}
 
 /**
  * Factory for ordered content objects.
@@ -234,7 +398,13 @@ object Ordered {
  * @param id      The optional ID to specify on the unordered tag.
  * @param classes Zero-or-more classes to specify on the unordered tag.
  */
-case class Unordered(content: Vector[Item], id: Option[String], classes: Vector[String]) extends Content.Tag
+case class Unordered(content: Vector[Item], id: Option[String], classes: Vector[String]) extends Content.Tag {
+
+  /* Return the content. */
+  override def stripped: String =
+    ": " + content.map(_.stripped).mkString(", ")
+
+}
 
 /**
  * Factory for unordered content objects.
@@ -271,7 +441,12 @@ object Unordered {
  * @param id      The optional ID to specify on the item tag.
  * @param classes Zero-or-more classes to specify on the item tag.
  */
-case class Item(content: Content, id: Option[String], classes: Vector[String]) extends Content.Tag
+case class Item(content: Content, id: Option[String], classes: Vector[String]) extends Content.Tag {
+
+  /* Return the content. */
+  override def stripped: String = content.stripped
+
+}
 
 /**
  * Factory for item content objects.
@@ -307,6 +482,9 @@ object Item {
  * @param content The sequence of content objects to concatenate.
  */
 case class Sequence(content: Vector[Content]) extends Content {
+
+  /* Return the content. */
+  override def stripped: String = content map (_.stripped) mkString " "
 
   /* Concatenate this content with that content taking note of sequences. */
   override def ~(that: Content): Content = that match {

@@ -23,19 +23,25 @@ package net.wayfarerx.www
  */
 sealed trait Data
 
+object Data {
+
+  sealed trait Singular extends Data
+
+}
+
 /**
  * A leaf node containing a single value.
  *
  * @param value The value of this node.
  */
-case class Value(value: String) extends Data
+case class Value(value: String) extends Data.Singular
 
 /**
  * A branch node containing an ordered collection of structured data trees.
  *
  * @param collection The ordered collection of structured data trees.
  */
-case class Collection(collection: Vector[Data]) extends Data
+case class Collection(collection: Vector[Data.Singular]) extends Data
 
 /**
  * Factory for collection data.
@@ -48,7 +54,7 @@ object Collection {
    * @param collection The collection of data the instance will contain.
    * @return A new collection data.
    */
-  def apply(collection: Data*): Collection = Collection(collection.toVector)
+  def apply(collection: Data.Singular*): Collection = Collection(collection.toVector)
 
 }
 
@@ -57,7 +63,7 @@ object Collection {
  *
  * @param structure The indexed collection of structured data trees.
  */
-case class Structure(structure: Map[String, Data]) extends Data {
+case class Structure(structure: Map[String, Data]) extends Data.Singular {
 
   /**
    * Returns the data associated with the specified key.

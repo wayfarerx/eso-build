@@ -1,0 +1,20 @@
+title: wayfarerx.net
+email: x@wayfarerx.net
+description: The misadventures of wayfarerx.
+image: /images/wx.png
+image-alt: wayfarerx logo
+
+baseurl: ""
+url: ""
+
+twitter: thewayfarerx
+github:  wayfarerx
+youtube: UCjx8a2ya26OK-lrcisYDQSw
+twitch:  wayfarer_x
+forums:  wayfarerx
+
+streaming_url:  https://www.twitch.tv/wayfarer_x
+
+markdown: kramdown
+
+exclude: [vendor]

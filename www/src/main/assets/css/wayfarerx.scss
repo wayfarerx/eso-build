@@ -1,0 +1,29 @@
+---
+---
+@import 'flexbox';
+
+$body-color: #15171a;
+$background-color: #272b30;
+$text-color: #c8c8c8;
+
+$size-small: 576px;
+$size-medium: 768px;
+$size-large: 992px;
+$size-max: 1200px;
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background: $body-color;
+  color: $text-color;
+
+  header, main, footer {
+    background: $background-color;
+    margin: auto;
+    max-width: $size-max;
+  }
+
+}
+

@@ -11,5 +11,9 @@ lazy val www = (project in file("www")).
     common,
     name := "www",
     libraryDependencies += catsEffect,
+    libraryDependencies += fs2,
+    libraryDependencies += fs2io,
     libraryDependencies += scalaTest % Test
   )
+
+run in Compile <<= (run in Compile in www)
