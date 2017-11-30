@@ -9,7 +9,7 @@ deploy:
   skip_cleanup: true
   github_token: $GITHUB_TOKEN
   local_dir: target/website/
-  repo: wayfarerx.github.io
+  repo: wayfarerx/wayfarerx.github.io
   target_branch: master
   fqdn: wayfarerx.net
   on:
