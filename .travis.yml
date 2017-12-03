@@ -20,4 +20,5 @@ deploy:
     branch: master
 
 after_deploy:
-  - ./bin/purge.sh
+  - chmod +x ./bin/purge.sh
+  - ./bin/purge.sh $CLOUDFLARE_TOKEN
