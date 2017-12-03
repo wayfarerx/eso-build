@@ -46,12 +46,12 @@ trait AssetDeployment extends FileOperations {
    */
   protected final def deployAssets(source: Directory, destination: Directory): IO[Unit] = for {
     _ <- IO.shift(ioContext)
-    assets = findAllAssets(source, destination) map (deployAsset _).tupled
+    result <- findAllAssets(source, destination).flatMap((deployAsset _).tupled).fold(())((_, _) => ()).run
     _ <- IO.shift
-    result <- {
+    /*result <- {
       implicit val context: ExecutionContext = ioContext
       assets.join(assetParallelism).fold(())((_, _) => ()).run
-    }
+    }*/
   } yield result
 
   /**

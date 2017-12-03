@@ -79,9 +79,22 @@ abstract class Landing extends Composite {
   /** The category that contains this component. */
   final override def category: Option[String] = None
 
+  def content: Vector[Content]
+
 }
 
-abstract class Index(parent: Composite) extends Component(parent) with Composite {
+abstract class Topic extends Composite {
+
+  /** The category that contains this component. */
+  final override def category: Option[String] = None
+
+  def content: Vector[Content]
+
+}
+
+abstract class Subtopic(parent: Composite) extends Component(parent) with Composite {
+
+  def content: Vector[Content]
 
 }
 

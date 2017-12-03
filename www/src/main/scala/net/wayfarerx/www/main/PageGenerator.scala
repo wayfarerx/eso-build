@@ -25,6 +25,8 @@ import cats.effect.IO
 
 import fs2.{Stream, io, text}
 
+import drinks.Drinks
+
 /**
  * Strategy for generating pages in the website.
  */
@@ -35,9 +37,9 @@ trait PageGenerator extends FileOperations {
   protected def pageParallelism: Int = 8
 
   /** The root landing page in the website. */
-  private val LandingPage = new Landing {
+  private val Landings: Stream[IO, Entity] = Stream(new Landing {
 
-    override def name: String = "landing"
+    override def name: String = "home"
 
     override def location: String = "/"
 
@@ -47,7 +49,10 @@ trait PageGenerator extends FileOperations {
 
     override def imageDescription: Option[String] = None
 
-  }
+    override def content: Vector[Content] =
+      Vector(Image("/images/home.png", "wayfarerx logo", "landing"))
+
+  }, Drinks)
 
   /**
    * Generates all the pages in the website into the specified directory.
@@ -57,7 +62,7 @@ trait PageGenerator extends FileOperations {
    */
   protected final def generatePages(destination: Directory): IO[Unit] = for {
     _ <- IO.shift(ioContext)
-    streams <- IO.pure(findAllEntities(destination, LandingPage) map (generatePage _).tupled)
+    streams = Landings flatMap (findAllEntities(destination, _)) map (generatePage _).tupled
     _ <- IO.shift
     result <- {
       implicit val context: ExecutionContext = ioContext
@@ -77,9 +82,12 @@ trait PageGenerator extends FileOperations {
       case landing: Landing =>
         Stream(destination -> landing) ++
           Stream.emits(landing.components).flatMap(findAllEntities(destination, _))
-      case index: Index =>
-        Stream.eval(Directory.assume(destination.path.resolve(index.id))).map(_ -> index) ++
-          Stream.emits(index.components).flatMap(findAllEntities(destination, _))
+      case topic: Topic =>
+        Stream.eval(Directory.assume(destination.path.resolve(topic.id))).map(_ -> topic) ++
+          Stream.emits(topic.components).flatMap(findAllEntities(destination, _))
+      case subtopic: Subtopic =>
+        Stream.eval(Directory.assume(destination.path.resolve(subtopic.id))).map(_ -> subtopic) ++
+          Stream.emits(subtopic.components).flatMap(findAllEntities(destination, _))
       case article: Article =>
         Stream.eval(Directory.assume(destination.path.resolve(article.id))).map(_ -> article)
     }
@@ -92,9 +100,20 @@ trait PageGenerator extends FileOperations {
    * @return A stream that generates the requested page.
    */
   private def generatePage(directory: Directory, entity: Entity): Stream[IO, Unit] = for {
-    dir <- Stream eval directory.create
+    dir <- {
+      println()
+      println()
+      println(s"Create ${directory.path}")
+      Stream eval directory.create
+    }
     file <- Stream eval File.assume(dir.path.resolve("index.html"))
-    result <- entity.render through text.utf8Encode through io.file.writeAll(file.path)
+    result <- {
+      println(s"Write to ${file.path}")
+      entity.render filter { str =>
+        print(str)
+        true
+      } through text.utf8Encode through io.file.writeAll(file.path)
+    }
   } yield result
 
 }

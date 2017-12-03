@@ -39,9 +39,11 @@ object Ingredient {
 
 }
 
-abstract class Ingredients(parent: Composite) extends Index(parent) {
+abstract class Ingredients(parent: Composite) extends Subtopic(parent) {
 
   override def imageDescription: Option[String] = None
+
+  override def content: Vector[Content] = Vector()
 
 }
 

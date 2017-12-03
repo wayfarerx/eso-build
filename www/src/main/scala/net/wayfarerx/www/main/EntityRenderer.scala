@@ -8,7 +8,8 @@ import fs2.Stream
 object EntityRenderer extends Renderer[Entity] {
 
   val Landing: Data = "landing"
-  val Index: Data = "index"
+  val Topic: Data = "topic"
+  val Subtopic: Data = "subtopic"
   val Article: Data = "article"
 
   override def render(entity: Entity): Stream[IO, String] = {
@@ -23,11 +24,13 @@ object EntityRenderer extends Renderer[Entity] {
     }.getOrElse(Map())
     val (frontMatter, content) = entity match {
       case landing: Landing =>
-        Map("layout" -> Landing) -> Sequence() // FIXME
-      case index: Index =>
-        Map("layout" -> Index) -> Sequence() // FIXME
+        Map("layout" -> Landing) -> Sequence(landing.content)
+      case topic: Topic =>
+        Map("layout" -> Topic) -> Sequence(topic.content)
+      case subtopic: Subtopic =>
+        Map("layout" -> Subtopic) -> Sequence(subtopic.content)
       case article: Article =>
-        Map("layout" -> Article) -> Sequence(article.content) // FIXME
+        Map("layout" -> Article) -> Sequence(article.content)
     }
     Stream("---", NewLine) ++
       Structure(metadata ++ frontMatter).render ++

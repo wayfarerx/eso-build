@@ -13,13 +13,14 @@ $size-max: 1200px;
 
 html, body {
   height: 100%;
+  margin: 0;
 }
 
 body {
   background: $body-color;
   color: $text-color;
 
-  header, main, footer {
+  header, main, footer, h1, ul, p {
     background: $background-color;
     margin: auto;
     max-width: $size-max;
