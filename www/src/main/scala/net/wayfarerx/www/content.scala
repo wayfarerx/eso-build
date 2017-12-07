@@ -82,6 +82,48 @@ case class Text(content: String) extends Content.Singular {
 }
 
 /**
+ * Represents a unit of content wrapped in <p></p> tags with an optional ID and class list.
+ *
+ * @param content The content to wrap with a paragraph tag.
+ * @param id      The optional ID to specify on the paragraph tag.
+ * @param classes Zero-or-more classes to specify on the paragraph tag.
+ */
+case class Paragraph(content: Content, id: Option[String], classes: Vector[String]) extends Content.Tag {
+
+  /* Return the content. */
+  override def stripped: String = content.stripped
+
+}
+
+/**
+ * Factory for paragraph content objects.
+ */
+object Paragraph {
+
+  /**
+   * Creates a new paragraph content object.
+   *
+   * @param content The content to wrap with a paragraph tag.
+   * @param classes Zero-or-more classes to specify on the paragraph tag.
+   * @return The new paragraph content object.
+   */
+  def apply(content: Content, classes: String*): Paragraph =
+    Paragraph(content, None, classes.toVector)
+
+  /**
+   * Creates a new paragraph content object.
+   *
+   * @param content The content to wrap with a paragraph tag.
+   * @param id      The optional ID to specify on the paragraph tag.
+   * @param classes Zero-or-more classes to specify on the paragraph tag.
+   * @return The new paragraph content object.
+   */
+  def apply(content: Content, id: Option[String], classes: String*): Paragraph =
+    Paragraph(content, id, classes.toVector)
+
+}
+
+/**
  * Represents a unit of content wrapped in <a></a> tags with an optional ID and class list.
  *
  * @param href    The location the link points to.
@@ -507,5 +549,176 @@ object Sequence {
    */
   def apply(content: Content*): Sequence =
     Sequence(content.toVector)
+
+}
+
+/**
+ * Represents a unit of content wrapped in <section></section> tags with an optional ID and class list.
+ *
+ * @param content The content to wrap with a section tag.
+ * @param id      The optional ID to specify on the section tag.
+ * @param classes Zero-or-more classes to specify on the section tag.
+ */
+case class Section(content: Content, id: Option[String], classes: Vector[String]) extends Content.Tag {
+
+  /* Return the content. */
+  override def stripped: String = content.stripped
+
+}
+
+/**
+ * Factory for section content objects.
+ */
+object Section {
+
+  /**
+   * Creates a new section content object.
+   *
+   * @param content The content to wrap with a section tag.
+   * @param classes Zero-or-more classes to specify on the section tag.
+   * @return The new section content object.
+   */
+  def apply(content: Content, classes: String*): Section =
+    Section(content, None, classes.toVector)
+
+  /**
+   * Creates a new section content object.
+   *
+   * @param content The content to wrap with a section tag.
+   * @param id      The optional ID to specify on the section tag.
+   * @param classes Zero-or-more classes to specify on the section tag.
+   * @return The new section content object.
+   */
+  def apply(content: Content, id: Option[String], classes: String*): Section =
+    Section(content, id, classes.toVector)
+
+}
+
+/**
+ * Represents a unit of content wrapped in <header></header> tags with an optional ID and class list.
+ *
+ * @param content The content to wrap with a header tag.
+ * @param id      The optional ID to specify on the header tag.
+ * @param classes Zero-or-more classes to specify on the header tag.
+ */
+case class Header(content: Content, id: Option[String], classes: Vector[String]) extends Content.Tag {
+
+  /* Return the content. */
+  override def stripped: String = content.stripped
+
+}
+
+/**
+ * Factory for header content objects.
+ */
+object Header {
+
+  /**
+   * Creates a new header content object.
+   *
+   * @param content The content to wrap with a header tag.
+   * @param classes Zero-or-more classes to specify on the header tag.
+   * @return The new header content object.
+   */
+  def apply(content: Content, classes: String*): Header =
+    Header(content, None, classes.toVector)
+
+  /**
+   * Creates a new header content object.
+   *
+   * @param content The content to wrap with a header tag.
+   * @param id      The optional ID to specify on the header tag.
+   * @param classes Zero-or-more classes to specify on the header tag.
+   * @return The new header content object.
+   */
+  def apply(content: Content, id: Option[String], classes: String*): Header =
+    Header(content, id, classes.toVector)
+
+}
+
+/**
+ * Represents a unit of content wrapped in <footer></footer> tags with an optional ID and class list.
+ *
+ * @param content The content to wrap with a footer tag.
+ * @param id      The optional ID to specify on the footer tag.
+ * @param classes Zero-or-more classes to specify on the footer tag.
+ */
+case class Footer(content: Content, id: Option[String], classes: Vector[String]) extends Content.Tag {
+
+  /* Return the content. */
+  override def stripped: String = content.stripped
+
+}
+
+/**
+ * Factory for footer content objects.
+ */
+object Footer {
+
+  /**
+   * Creates a new footer content object.
+   *
+   * @param content The content to wrap with a footer tag.
+   * @param classes Zero-or-more classes to specify on the footer tag.
+   * @return The new footer content object.
+   */
+  def apply(content: Content, classes: String*): Footer =
+    Footer(content, None, classes.toVector)
+
+  /**
+   * Creates a new footer content object.
+   *
+   * @param content The content to wrap with a footer tag.
+   * @param id      The optional ID to specify on the footer tag.
+   * @param classes Zero-or-more classes to specify on the footer tag.
+   * @return The new footer content object.
+   */
+  def apply(content: Content, id: Option[String], classes: String*): Footer =
+    Footer(content, id, classes.toVector)
+
+}
+
+/**
+ * Represents a unit of content wrapped in <h*></h*> tags with an optional ID and class list.
+ *
+ * @param level The heading level to use.
+ * @param content The content to wrap with a heading tag.
+ * @param id      The optional ID to specify on the heading tag.
+ * @param classes Zero-or-more classes to specify on the heading tag.
+ */
+case class Heading(level: Int, content: Content, id: Option[String], classes: Vector[String]) extends Content.Tag {
+
+  /* Return the content. */
+  override def stripped: String = content.stripped
+
+}
+
+/**
+ * Factory for heading content objects.
+ */
+object Heading {
+
+  /**
+   * Creates a new heading content object.
+   *
+   * @param level The heading level to use.
+   * @param content The content to wrap with a heading tag.
+   * @param classes Zero-or-more classes to specify on the heading tag.
+   * @return The new heading content object.
+   */
+  def apply(level: Int, content: Content, classes: String*): Heading =
+    Heading(level, content, None, classes.toVector)
+
+  /**
+   * Creates a new heading content object.
+   *
+   * @param level The heading level to use.
+   * @param content The content to wrap with a heading tag.
+   * @param id      The optional ID to specify on the heading tag.
+   * @param classes Zero-or-more classes to specify on the heading tag.
+   * @return The new heading content object.
+   */
+  def apply(level: Int, content: Content, id: Option[String], classes: String*): Heading =
+    Heading(level, content, id, classes.toVector)
 
 }

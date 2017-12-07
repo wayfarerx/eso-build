@@ -14,28 +14,35 @@ object EntityRenderer extends Renderer[Entity] {
 
   override def render(entity: Entity): Stream[IO, String] = {
     val metadata = Map[String, Data](
+      "id" -> entity.id,
       "title" -> entity.title,
-      "description" -> entity.description.stripped
-    ) ++ entity.image.map { image =>
-      Map[String, Data](
-        "image" -> image.src,
-        "image-alt" -> image.alt
-      )
-    }.getOrElse(Map())
+      "description" -> entity.description.stripped,
+      "image" -> entity.image.src,
+      "image-alt" -> entity.image.alt
+    )
     val (frontMatter, content) = entity match {
       case landing: Landing =>
-        Map("layout" -> Landing) -> Sequence(landing.content)
+        Map("layout" -> Landing) ->
+          Sequence(Vector(Image("/images/home.png", "wayfarerx logo", "landing"))) // FIXME
       case topic: Topic =>
-        Map("layout" -> Topic) -> Sequence(topic.content)
+        Map("layout" -> Topic) ++
+          topic.headline.map(h => Map("headline" -> (s"'${h.replace("'", "''")}'": Data))).getOrElse(Map()) ->
+          componentsToContent(topic.components)
       case subtopic: Subtopic =>
-        Map("layout" -> Subtopic) -> Sequence(subtopic.content)
+        Map("layout" -> Topic) ->
+          componentsToContent(subtopic.components)
       case article: Article =>
-        Map("layout" -> Article) -> Sequence(article.content)
+        Map("layout" -> Article) ->
+          Sequence(article.content)
     }
     Stream("---", NewLine) ++
       Structure(metadata ++ frontMatter).render ++
       Stream(NewLine, "---", NewLine) ++
       content.render
   }
+
+  private def componentsToContent(components: Vector[Component]): Sequence = Sequence(components map { component =>
+    Section(Header(Heading(2, component.title)) ~ Paragraph(component.description) ~ component.image) ~ NewLine
+  })
 
 }

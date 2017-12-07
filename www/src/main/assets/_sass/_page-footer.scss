@@ -1,0 +1,42 @@
+
+$foot-border: 1px solid #616161;
+
+footer.page-footer {
+  align-items: center;
+  background: linear-gradient(#343940, #2e3238);
+  border: $foot-border;
+  display: flex;
+  flex-direction: column;
+  padding: .5em;
+
+  address.page-footer-links {
+    align-items: center;
+    display: flex;
+
+    a {
+      display: block;
+      margin: 0 .5em;
+      text-decoration: none;
+    }
+
+  }
+
+  small.page-footer-copyright {
+    margin: 0;
+    padding-top: .5em;
+    text-align: center;
+  }
+
+}
+
+@media (min-width: 577px) {
+
+  footer.page-footer {
+
+    address.page-footer-links {
+      font-size: 1.45em;
+    }
+
+  }
+
+}

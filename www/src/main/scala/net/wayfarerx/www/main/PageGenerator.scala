@@ -37,22 +37,17 @@ trait PageGenerator extends FileOperations {
   protected def pageParallelism: Int = 8
 
   /** The root landing page in the website. */
-  private val Landings: Stream[IO, Entity] = Stream(new Landing {
+  private val Roots: Stream[IO, Entity] = Stream(new Landing {
 
     override def name: String = "home"
 
-    override def location: String = "/"
-
     override def title: String = ""
 
-    override def description: Content = "The misadventures of wayfarerx."
+    override def description: String = "The misadventures of wayfarerx."
 
-    override def imageDescription: Option[String] = None
+    override def topics: Vector[Topic] = Vector(Drinks)
 
-    override def content: Vector[Content] =
-      Vector(Image("/images/home.png", "wayfarerx logo", "landing"))
-
-  }, Drinks)
+  })
 
   /**
    * Generates all the pages in the website into the specified directory.
@@ -62,7 +57,7 @@ trait PageGenerator extends FileOperations {
    */
   protected final def generatePages(destination: Directory): IO[Unit] = for {
     _ <- IO.shift(ioContext)
-    streams = Landings flatMap (findAllEntities(destination, _)) map (generatePage _).tupled
+    streams = Roots flatMap (findAllEntities(destination, _)) map (generatePage _).tupled
     _ <- IO.shift
     result <- {
       implicit val context: ExecutionContext = ioContext
@@ -80,8 +75,7 @@ trait PageGenerator extends FileOperations {
   private def findAllEntities(destination: Directory, entity: Entity): Stream[IO, (Directory, Entity)] =
     entity match {
       case landing: Landing =>
-        Stream(destination -> landing) ++
-          Stream.emits(landing.components).flatMap(findAllEntities(destination, _))
+        Stream(destination -> landing)
       case topic: Topic =>
         Stream.eval(Directory.assume(destination.path.resolve(topic.id))).map(_ -> topic) ++
           Stream.emits(topic.components).flatMap(findAllEntities(destination, _))
@@ -100,20 +94,9 @@ trait PageGenerator extends FileOperations {
    * @return A stream that generates the requested page.
    */
   private def generatePage(directory: Directory, entity: Entity): Stream[IO, Unit] = for {
-    dir <- {
-      println()
-      println()
-      println(s"Create ${directory.path}")
-      Stream eval directory.create
-    }
+    dir <- Stream eval directory.create
     file <- Stream eval File.assume(dir.path.resolve("index.html"))
-    result <- {
-      println(s"Write to ${file.path}")
-      entity.render filter { str =>
-        print(str)
-        true
-      } through text.utf8Encode through io.file.writeAll(file.path)
-    }
+    result <- entity.render through text.utf8Encode through io.file.writeAll(file.path)
   } yield result
 
 }

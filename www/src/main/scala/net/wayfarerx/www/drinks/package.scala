@@ -1,5 +1,8 @@
 package net.wayfarerx.www
 
+import net.wayfarerx.www.drinks.ingredients.Ingredient
+import net.wayfarerx.www.drinks.cocktails.Cocktail
+
 package object drinks {
 
   val Category = "drinks"
@@ -8,7 +11,7 @@ package object drinks {
 
   implicit final class IngredientOps[T <: Ingredient](val ingredient: T) extends AnyVal {
 
-    def apply(amount: T#Measure): Recipe.Component[T] = Recipe.Component(ingredient, amount)
+    def apply(amount: T#Measure): Cocktail.Component[T] = Cocktail.Component(ingredient, amount)
 
   }
 

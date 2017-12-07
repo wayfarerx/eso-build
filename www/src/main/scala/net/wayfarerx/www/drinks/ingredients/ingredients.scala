@@ -18,12 +18,11 @@
 
 package net.wayfarerx.www
 package drinks
+package ingredients
 
-abstract class Ingredient(parent: Composite) extends Article(parent) {
+trait Ingredient extends Article {
 
   type Measure <: Amount
-
-  override def imageDescription: Option[String] = None
 
   override def author: Option[String] = None
 
@@ -39,11 +38,7 @@ object Ingredient {
 
 }
 
-abstract class Ingredients(parent: Composite) extends Subtopic(parent) {
-
-  override def imageDescription: Option[String] = None
-
-  override def content: Vector[Content] = Vector()
+trait Ingredients extends Subtopic {
 
 }
 

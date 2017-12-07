@@ -1,16 +1,18 @@
 package net.wayfarerx.www
 package drinks
-package recipes
+package cocktails
 
-object Manhattan extends Recipe {
+import net.wayfarerx.www.drinks.ingredients._
+
+object Manhattan extends Cocktail {
 
   override def title: String = "Manhattan"
 
-  override def style: Style = Recipe.Style.BeforeDinner
+  override def style: Style = Cocktail.Style.BeforeDinner
 
-  override def description: Content = "A before dinner cocktail made with rye whiskey and sweet vermouth."
+  override def description: String = "A before dinner cocktail made with rye whiskey and sweet vermouth."
 
-  override def imageDescription: Option[String] = Some("A Manhattan.")
+  override def imageDescription: String = "A Manhattan."
 
   override def glass: Glass = Glass.Cocktail
 

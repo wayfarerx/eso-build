@@ -2,13 +2,37 @@
 <html>
 <head>
   {% include meta.html %}
+  <style>
+    main.page-topic header.page-topic-title { background-image: url('/images/{{ page.id }}/banner576.jpg'); }
+
+    @media screen and (min-device-width: 577px) {
+      main.page-topic header.page-topic-title { background-image: url('/images/{{ page.id }}/banner768.jpg'); }
+    }
+
+    @media screen and (min-device-width: 769px) {
+      main.page-topic header.page-topic-title { background-image: url('/images/{{ page.id }}/banner992.jpg'); }
+    }
+
+    @media screen and (min-device-width: 993px) {
+      main.page-topic header.page-topic-title { background-image: url('/images/{{ page.id }}/banner1200.jpg'); }
+    }
+
+
+  </style>
 </head>
 <body>
 {% include header.html %}
-<main>
-  <header>
+<main class="page-topic">
+  <header class="page-topic-title">
     <h1>{{ page.title }}</h1>
   </header>
+  {% if page.headline %}
+  <div class="page-topic-headline">
+    <hr>
+    <em>{{ page.headline }}</em>
+    <hr>
+  </div>
+  {% endif %}
   {{ content }}
 </main>
 {% include footer.html %}

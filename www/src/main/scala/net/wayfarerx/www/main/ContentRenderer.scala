@@ -12,6 +12,9 @@ object ContentRenderer extends Renderer[Content] {
     case Text(content) =>
       Stream(content)
 
+    case Paragraph(content, id, classes) =>
+      open("p", id, classes) ++ render(content) ++ close("p")
+
     case Link(href, content, id, classes) =>
       open("a", id, classes, "href" -> href) ++ render(content) ++ close("a")
 
@@ -38,6 +41,18 @@ object ContentRenderer extends Renderer[Content] {
 
     case Item(content, id, classes) =>
       open("li", id, classes) ++ render(content) ++ close("li")
+
+    case Section(content, id, classes) =>
+      open("section", id, classes) ++ render(content) ++ close("section")
+
+    case Header(content, id, classes) =>
+      open("header", id, classes) ++ render(content) ++ close("header")
+
+    case Footer(content, id, classes) =>
+      open("footer", id, classes) ++ render(content) ++ close("footer")
+
+    case Heading(level, content, id, classes) =>
+      open(s"h$level", id, classes) ++ render(content) ++ close(s"h$level")
 
     case Sequence(content) =>
       Stream.emits(content).flatMap(render(_))
