@@ -75,7 +75,8 @@ trait PageGenerator extends FileOperations {
   private def findAllEntities(destination: Directory, entity: Entity): Stream[IO, (Directory, Entity)] =
     entity match {
       case landing: Landing =>
-        Stream(destination -> landing)
+        Stream(destination -> landing) ++
+          Stream.emits(landing.topics).flatMap(findAllEntities(destination, _))
       case topic: Topic =>
         Stream.eval(Directory.assume(destination.path.resolve(topic.id))).map(_ -> topic) ++
           Stream.emits(topic.components).flatMap(findAllEntities(destination, _))
