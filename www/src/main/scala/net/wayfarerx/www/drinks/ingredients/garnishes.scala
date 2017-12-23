@@ -4,7 +4,7 @@ package ingredients
 
 sealed trait Garnish extends Ingredient {
 
-  override def parent: Composite = Garnishes
+  override def parent: Option[Composite] = Some(Garnishes)
 
 }
 
@@ -14,7 +14,7 @@ object Garnish {
 
     override type Measure = Amount.Units
 
-    override def name = "maraschino-cherry"
+    override def displayName = "Maraschino cherry"
 
     override def title = "Maraschino Cherry"
 
@@ -25,20 +25,16 @@ object Garnish {
 
 }
 
-object Garnishes extends Ingredients {
+object Garnishes extends Topic {
 
-  override def parent: Composite = Drinks
+  override def parent: Option[Composite] = Some(Drinks)
 
-  override def name: String = "garnishes"
+  override def displayName: String = "garnishes"
 
   override def title: String = "Garnishes"
 
-  override def image: Image = parent.image
-
   override def description: String = "A decoration or embellishment used in cocktails."
 
-  override def headline: Option[String] = Some(""""Whisky is liquid sunshine." - George Bernard Shaw""")
-
-  override def components: Vector[Component] = Vector(Garnish.MaraschinoCherry)
+  override def children: Vector[Component] = Vector(Garnish.MaraschinoCherry)
 
 }

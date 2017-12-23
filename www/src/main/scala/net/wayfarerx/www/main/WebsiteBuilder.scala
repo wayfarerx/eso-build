@@ -20,7 +20,6 @@ package net.wayfarerx.www
 package main
 
 import java.nio.file.Paths
-
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.{Executors, ThreadFactory}
 
@@ -28,28 +27,12 @@ import concurrent.ExecutionContext
 
 import cats.effect.IO
 
+import drinks.Drinks
+
 /**
  * Main entry point for the website builder.
  */
-object WebsiteBuilder
-  extends FileOperations
-    with AssetDeployment
-    with PageGenerator
-    with MainRuntime
-    with App {
-
-  /** The main CPU-bound thread pool. */
-  override protected val context: ExecutionContext = ExecutionContext.global
-
-  /** The IO-bound thread pool. */
-  override protected val ioContext: ExecutionContext =
-    ExecutionContext.fromExecutor(Executors.newCachedThreadPool(new ThreadFactory {
-      val group = new ThreadGroup("IO")
-      val counter = new AtomicLong
-
-      override def newThread(r: Runnable): Thread =
-        new Thread(group, r, s"${group.getName}-${counter.incrementAndGet()}")
-    }))
+object WebsiteBuilder extends App {
 
   // Verify the input.
   if (args.length > 0) {
@@ -57,16 +40,66 @@ object WebsiteBuilder
   } else {
     // Construct the program.
     val program = for {
-      assets <- Directory.require(Paths.get("www", "src", "main", "assets"))
-      destination <- Directory.assume(Paths.get("target", "website"))
-      _ <- deployAssets(assets, destination)
-      _ <- generatePages(destination)
+      root <- Directory.require(Paths.get("."))
+      asset <- Directory.require(Paths.get("www", "src", "main", "assets"))
+      target <- Directory.assume(Paths.get("target", "website"))
+      task = new Task(root, asset, target)
+      _ <- task.deployAssets
+      _ <- task.generatePages
     } yield ()
     // Execute the program.
     program.runAsync {
       case Left(thrown) => IO(try thrown.printStackTrace() finally System.exit(-1))
       case Right(_) => IO(System.exit(0))
     }.unsafeRunSync()
+  }
+
+  /**
+   * The task that implements the website construction.
+   *
+   * @param rootDirectory   The root directory of the project.
+   * @param assetDirectory  The directory to copy assets from.
+   * @param targetDirectory The directory to construct the website in.
+   */
+  private final class Task(
+    override val rootDirectory: Directory,
+    override val assetDirectory: Directory,
+    override val targetDirectory: Directory)
+    extends StructureRenderer
+      with ContentRenderer
+      with EntityRenderer
+      with AssetDeployment
+      with PageGenerator
+      with Context {
+
+    /* The main CPU-bound thread pool. */
+    override val executionContext: ExecutionContext = ExecutionContext.global
+
+    /* The IO-bound thread pool. */
+    override val ioExecutionContext: ExecutionContext =
+      ExecutionContext.fromExecutor(Executors.newCachedThreadPool(new ThreadFactory {
+        val group = new ThreadGroup("IO")
+        val counter = new AtomicLong
+
+        override def newThread(r: Runnable): Thread =
+          new Thread(group, r, s"${group.getName}-${counter.incrementAndGet()}")
+      }))
+
+    /** The root landing page in the website. */
+    override val homePage: Landing = new Landing {
+
+      override def name: String = "home"
+
+      override def displayName: String = "wayfarerx.net"
+
+      override def title: String = ""
+
+      override def description: String = "The misadventures of wayfarerx."
+
+      override def children: Vector[Component] = Vector(Drinks)
+
+    }
+
   }
 
 }

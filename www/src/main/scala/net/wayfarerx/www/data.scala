@@ -37,6 +37,13 @@ object Data {
 case class Value(value: String) extends Data.Singular
 
 /**
+ * A leaf node containing a single rendered content object.
+ *
+ * @param content The content of this node.
+ */
+case class Rendered(content: Content) extends Data.Singular
+
+/**
  * A branch node containing an ordered collection of structured data trees.
  *
  * @param collection The ordered collection of structured data trees.

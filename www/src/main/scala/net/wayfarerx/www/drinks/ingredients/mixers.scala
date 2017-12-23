@@ -6,7 +6,7 @@ sealed trait Mixer extends Ingredient {
 
   final override type Measure = Amount.Liquid
 
-  override def parent: Composite = Mixers
+  override def parent: Option[Composite] = Some(Mixers)
 
 }
 
@@ -14,7 +14,7 @@ object Mixer {
 
   sealed abstract class Bitters extends Mixer {
 
-    override def parent: Composite = AllBitters
+    override def parent: Option[Composite] = Some(AllBitters)
 
   }
 
@@ -23,6 +23,8 @@ object Mixer {
     case object Angostura extends Bitters {
 
       override def name: String = "angostura"
+
+      override def displayName: String = "Angostura bitters"
 
       override def title = "Angostura Bitters"
 
@@ -33,41 +35,33 @@ object Mixer {
 
   }
 
-  object AllBitters extends Ingredients {
+  object AllBitters extends Topic {
 
-    override def parent: Composite = Mixers
+    override def parent: Option[Composite] = Some(Mixers)
 
-    override def name: String = "bitters"
+    override def displayName: String = "bitters"
 
     override def title: String = "Bitters"
-
-    override def image: Image = parent.image
 
     override def description: String = "Traditionally an alcoholic preparation flavored with botanical matter such " +
       "that the end result is characterized by a bitter, sour, or bittersweet flavor."
 
-    override def headline: Option[String] = Some(""""Whisky is liquid sunshine." - George Bernard Shaw""")
-
-    override def components: Vector[Component] = Vector(Bitters.Angostura)
+    override def children: Vector[Component] = Vector(Bitters.Angostura)
 
   }
 
 }
 
-object Mixers extends Ingredients {
+object Mixers extends Topic {
 
-  override def parent: Composite = Drinks
+  override def parent: Option[Composite] = Some(Drinks)
 
-  override def name: String = "mixers"
+  override def displayName: String = "mixers"
 
   override def title: String = "Mixers"
 
-  override def image: Image = parent.image
-
   override def description: String = "An additive used in cocktails."
 
-  override def headline: Option[String] = Some(""""Whisky is liquid sunshine." - George Bernard Shaw""")
-
-  override def components: Vector[Component] = Vector(Mixer.AllBitters)
+  override def children: Vector[Component] = Vector(Mixer.AllBitters)
 
 }

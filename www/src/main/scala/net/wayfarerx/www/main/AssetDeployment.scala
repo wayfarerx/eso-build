@@ -19,39 +19,36 @@
 package net.wayfarerx.www
 package main
 
-import concurrent.ExecutionContext
-
 import cats.effect.IO
-
 import fs2.{Stream, io}
+
+import scala.concurrent.ExecutionContext
 
 /**
  * Strategy for deploying the static file assets in the website.
  */
-trait AssetDeployment extends FileOperations {
-  self: MainRuntime =>
+trait AssetDeployment {
+  self: Context =>
 
   /** The size of the buffer to use. */
-  protected def assetBufferSize: Int = 1024 * 4
+  def assetBufferSize: Int = 1024 * 4
 
   /** The maximum number of IO threads to use. */
-  protected def assetParallelism: Int = 8
+  def assetParallelism: Int = 8
 
   /**
    * Deploys a collection of source assets to a destination.
    *
-   * @param source      The source directory to deploy from.
-   * @param destination The destination directory to deploy to.
    * @return The effect of the asset deployment.
    */
-  protected final def deployAssets(source: Directory, destination: Directory): IO[Unit] = for {
-    _ <- IO.shift(ioContext)
-    result <- findAllAssets(source, destination).flatMap((deployAsset _).tupled).fold(())((_, _) => ()).run
+  final def deployAssets: IO[Unit] = for {
+    _ <- IO.shift(ioExecutionContext)
+    streams <- IO.pure(findAllAssets(assetDirectory, targetDirectory) map { case (d, f, t) => deployAsset(d, f, t) })
     _ <- IO.shift
-    /*result <- {
-      implicit val context: ExecutionContext = ioContext
-      assets.join(assetParallelism).fold(())((_, _) => ()).run
-    }*/
+    result <- {
+      implicit val executionContext: ExecutionContext = ioExecutionContext
+      streams.join(assetParallelism).fold(())((_, _) => ()).run
+    }
   } yield result
 
   /**

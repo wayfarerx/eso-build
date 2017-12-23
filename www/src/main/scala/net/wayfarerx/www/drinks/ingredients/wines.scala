@@ -6,7 +6,9 @@ sealed trait Wine extends Ingredient {
 
   final override type Measure = Amount.Liquid
 
-  override def parent: Composite = Wines
+  override def displayName: String = title.toLowerCase
+
+  override def parent: Option[Composite] = Some(Wines)
 
 }
 
@@ -14,9 +16,7 @@ object Wine {
 
   sealed abstract class Vermouth extends Wine {
 
-    override def parent: Composite = Vermouths
-
-    override def title: String = "vermouth"
+    override def parent: Option[Composite] = Some(Vermouths)
 
     override def description: String = "An aromatized, fortified wine flavored with various botanicals " +
       "(roots, barks, flowers, seeds, herbs, and spices)."
@@ -29,7 +29,7 @@ object Wine {
 
       override def name: String = "dry"
 
-      override def title: String = "dry vermouth"
+      override def title: String = "Dry Vermouth"
 
     }
 
@@ -37,48 +37,40 @@ object Wine {
 
       override def name: String = "sweet"
 
-      override def title: String = "sweet vermouth"
+      override def title: String = "Sweet Vermouth"
 
     }
 
   }
 
-  object Vermouths extends Ingredients {
+  object Vermouths extends Topic {
 
-    override def parent: Composite = Wines
+    override def parent: Option[Composite] = Some(Wines)
 
-    override def name: String = "vermouth"
+    override def displayName: String = title.toLowerCase
 
     override def title: String = "Vermouth"
-
-    override def image: Image = parent.image
 
     override def description: String = "An aromatized, fortified wine flavored with various botanicals (roots, " +
       "barks, flowers, seeds, herbs, and spices)."
 
-    override def headline: Option[String] = Some(""""Whisky is liquid sunshine." - George Bernard Shaw""")
-
-    override def components: Vector[Component] = Vector(Vermouth.Dry, Vermouth.Sweet)
+    override def children: Vector[Component] = Vector(Vermouth.Dry, Vermouth.Sweet)
 
   }
 
 }
 
-object Wines extends Ingredients {
+object Wines extends Topic {
 
-  override def parent: Composite = Drinks
+  override def parent: Option[Composite] = Some(Drinks)
 
-  override def name: String = "wine"
+  override def displayName: String = title.toLowerCase
 
   override def title: String = "Wine"
-
-  override def image: Image = parent.image
 
   override def description: String = "An alcoholic beverage made from grapes, generally Vitis vinifera, fermented " +
     "without the addition of sugars, acids, enzymes, water, or other nutrients."
 
-  override def headline: Option[String] = Some(""""Whisky is liquid sunshine." - George Bernard Shaw""")
-
-  override def components: Vector[Component] = Vector(Wine.Vermouths)
+  override def children: Vector[Component] = Vector(Wine.Vermouths)
 
 }

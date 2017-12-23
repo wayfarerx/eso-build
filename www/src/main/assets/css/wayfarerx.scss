@@ -1,27 +1,17 @@
 ---
 ---
 
-@import url('https://fonts.googleapis.com/css?family=Rubik|Trirong');
+//
+// Variables
+//
+
+@import 'variables';
 
 //
 // Global Settings
 //
 
-$body-color: #15171a;
-$background-color: #272b30;
-$text-color: #c8c8c8;
-$link-color: #ededed;
-$visited-color: #dbdbdb;
-$hover-color: #f5f5f5;
-$active-color: #ffffff;
-
-$size-small: 576px;
-$size-medium: 768px;
-$size-large: 992px;
-$size-max: 1200px;
-
-$font-headline: 'Trirong', serif;
-$font-copy: 'Rubik', sans-serif;
+@import url('https://fonts.googleapis.com/css?family=Rubik|Trirong');
 
 *, *:before, *:after {
   box-sizing: inherit;
@@ -38,10 +28,14 @@ html, body {
 body {
   background: $body-color;
   color: $text-color;
-  font-family: $font-headline;
+  font-family: $font-copy;
 	min-height: 100vh;
 	display: flex;
 	flex-direction: column;
+}
+
+body .main > header {
+  font-family: $font-headline;
 }
 
 body > header,
@@ -51,12 +45,17 @@ body > footer {
   margin: 0 auto;
   padding: 0;
   width: 100%;
-  max-width: $size-max;
+  max-width: $size-full;
 }
 
 body > main {
   flex-grow: 1;
-  font-family: $font-copy;
+
+  @media (min-width: $size-full) {
+    border-left: $nav-border;
+    border-right: $nav-border;
+  }
+
 }
 
 body > main > header {
@@ -80,29 +79,36 @@ a:active {
 
 }
 
-@media (min-width: 577px) {
+h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: 0.25em;
+}
 
-  body > main {
-    border-left: 1em solid $body-color;
-    border-right: 1em solid $body-color;
-  }
-
+p {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
 }
 
 //
 // Page Header Settings
 //
 
-@import 'page-header';
+@import 'header';
 
 //
-// Page Footer Settings
+// Component Page Settings
 //
 
-@import 'page-footer';
+@import 'components';
 
 //
 // Topic Page Settings
 //
 
-@import 'page-topic';
+@import 'topic';
+
+//
+// Page Footer Settings
+//
+
+@import 'footer';

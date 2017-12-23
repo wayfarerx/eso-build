@@ -18,8 +18,6 @@
 
 package net.wayfarerx.www
 
-import java.io.PrintWriter
-
 import concurrent.ExecutionContext
 
 import cats.effect.IO
@@ -37,17 +35,8 @@ package object main {
   /** The text that denotes a line break. */
   val NewLine: String = "\r\n"
 
-  /** The content rendering strategy. */
-  implicit def ImplicitContentRenderer: Renderer[Content] = ContentRenderer
-
-  /** The structure rendering strategy. */
-  implicit def ImplicitStructureRenderer: Renderer[Structure] = StructureRenderer
-
-  /** The entity rendering strategy. */
-  implicit def ImplicitEntityRenderer: Renderer[Entity] = EntityRenderer
-
   /**
-   * Base for type classes that can render data, content & entities.
+   * Base for type classes that can render information.
    *
    * @tparam T The type of object to render.
    */
@@ -56,9 +45,9 @@ package object main {
     /**
      * Renders an object to a stream of strings.
      *
-     * @param value The value to render.
+     * @param renderable The object to render.
      */
-    def render(value: T): Stream[IO, String]
+    def render(renderable: T): Stream[IO, String]
 
   }
 
@@ -79,15 +68,27 @@ package object main {
   }
 
   /**
-   * Describes the concurrency runtime environment of the application.
+   * Describes the concurrent runtime environment of the application.
    */
-  trait MainRuntime {
+  trait Context {
 
     /** The main CPU-bound thread pool. */
-    protected implicit def context: ExecutionContext
+    implicit def executionContext: ExecutionContext
 
     /** The IO-bound thread pool. */
-    protected def ioContext: ExecutionContext
+    def ioExecutionContext: ExecutionContext
+
+    /** The root directory to use. */
+    def rootDirectory: Directory
+
+    /** The asset directory to use. */
+    def assetDirectory: Directory
+
+    /** The target directory to use. */
+    def targetDirectory: Directory
+
+    /** The home page of the site. */
+    def homePage: Landing
 
   }
 

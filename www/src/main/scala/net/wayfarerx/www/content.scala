@@ -23,9 +23,6 @@ package net.wayfarerx.www
  */
 sealed trait Content {
 
-  /** Returns the text of this content without markup. */
-  def stripped: String
-
   /**
    * Appends that content to this content.
    *
@@ -65,6 +62,14 @@ object Content {
     /** The optional class list of the HTML tag. */
     def classes: Vector[String]
 
+    /**
+     * Returns a copy of this tag with the specified ID.
+     *
+     * @param id The ID of the resulting tag.
+     * @return A copy of this tag with the specified ID.
+     */
+    def withId(id: Option[String]): Tag
+
   }
 
 }
@@ -74,25 +79,95 @@ object Content {
  *
  * @param content The content to represent.
  */
-case class Text(content: String) extends Content.Singular {
+case class Text(content: String) extends Content.Singular
 
-  /* Return the content. */
-  override def stripped: String = content
+/**
+ * Represents a unit of content wrapped in <em></em> tags with an optional ID and class list.
+ *
+ * @param content The content to wrap with an emphasis tag.
+ * @param id      The optional ID to specify on the emphasis tag.
+ * @param classes Zero-or-more classes to specify on the emphasis tag.
+ */
+case class Emphasis(content: Content, id: Option[String], classes: Vector[String]) extends Content.Tag {
+  def withId(id: Option[String]): Emphasis = copy(id = id)
+}
+
+/**
+ * Factory for emphasis content objects.
+ */
+object Emphasis {
+
+  /**
+   * Creates a new emphasis content object.
+   *
+   * @param content The content to wrap with a emphasis tag.
+   * @param classes Zero-or-more classes to specify on the emphasis tag.
+   * @return The new emphasis content object.
+   */
+  def apply(content: Content, classes: String*): Emphasis =
+    Emphasis(content, None, classes.toVector)
+
+  /**
+   * Creates a new emphasis content object.
+   *
+   * @param content The content to wrap with an emphasis tag.
+   * @param id      The optional ID to specify on the emphasis tag.
+   * @param classes Zero-or-more classes to specify on the emphasis tag.
+   * @return The new emphasis content object.
+   */
+  def apply(content: Content, id: Option[String], classes: String*): Emphasis =
+    Emphasis(content, id, classes.toVector)
+
+}
+
+/**
+ * Represents a unit of content wrapped in <strong></strong> tags with an optional ID and class list.
+ *
+ * @param content The content to wrap with a strong tag.
+ * @param id      The optional ID to specify on the strong tag.
+ * @param classes Zero-or-more classes to specify on the strong tag.
+ */
+case class Strong(content: Content, id: Option[String], classes: Vector[String]) extends Content.Tag {
+  def withId(id: Option[String]): Strong = copy(id = id)
+}
+
+/**
+ * Factory for strong content objects.
+ */
+object Strong {
+
+  /**
+   * Creates a new strong content object.
+   *
+   * @param content The content to wrap with a strong tag.
+   * @param classes Zero-or-more classes to specify on the strong tag.
+   * @return The new strong content object.
+   */
+  def apply(content: Content, classes: String*): Strong =
+    Strong(content, None, classes.toVector)
+
+  /**
+   * Creates a new emphasis content object.
+   *
+   * @param content The content to wrap with a emphasis tag.
+   * @param id      The optional ID to specify on the emphasis tag.
+   * @param classes Zero-or-more classes to specify on the emphasis tag.
+   * @return The new emphasis content object.
+   */
+  def apply(content: Content, id: Option[String], classes: String*): Emphasis =
+    Emphasis(content, id, classes.toVector)
 
 }
 
 /**
  * Represents a unit of content wrapped in <p></p> tags with an optional ID and class list.
  *
- * @param content The content to wrap with a paragraph tag.
+ * @param content The content to wrap with an paragraph tag.
  * @param id      The optional ID to specify on the paragraph tag.
  * @param classes Zero-or-more classes to specify on the paragraph tag.
  */
 case class Paragraph(content: Content, id: Option[String], classes: Vector[String]) extends Content.Tag {
-
-  /* Return the content. */
-  override def stripped: String = content.stripped
-
+  def withId(id: Option[String]): Paragraph = copy(id = id)
 }
 
 /**
@@ -124,6 +199,45 @@ object Paragraph {
 }
 
 /**
+ * Represents a unit of content wrapped in <div></div> tags with an optional ID and class list.
+ *
+ * @param content The content to wrap with a div tag.
+ * @param id      The optional ID to specify on the div tag.
+ * @param classes Zero-or-more classes to specify on the div tag.
+ */
+case class Div(content: Content, id: Option[String], classes: Vector[String]) extends Content.Tag {
+  def withId(id: Option[String]): Div = copy(id = id)
+}
+
+/**
+ * Factory for div content objects.
+ */
+object Div {
+
+  /**
+   * Creates a new div content object.
+   *
+   * @param content The content to wrap with a div tag.
+   * @param classes Zero-or-more classes to specify on the div tag.
+   * @return The new div content object.
+   */
+  def apply(content: Content, classes: String*): Div =
+    Div(content, None, classes.toVector)
+
+  /**
+   * Creates a new div content object.
+   *
+   * @param content The content to wrap with a div tag.
+   * @param id      The optional ID to specify on the div tag.
+   * @param classes Zero-or-more classes to specify on the div tag.
+   * @return The new div content object.
+   */
+  def apply(content: Content, id: Option[String], classes: String*): Div =
+    Div(content, id, classes.toVector)
+
+}
+
+/**
  * Represents a unit of content wrapped in <a></a> tags with an optional ID and class list.
  *
  * @param href    The location the link points to.
@@ -132,10 +246,7 @@ object Paragraph {
  * @param classes Zero-or-more classes to specify on the link tag.
  */
 case class Link(href: String, content: Content, id: Option[String], classes: Vector[String]) extends Content.Tag {
-
-  /* Return the content. */
-  override def stripped: String = content.stripped
-
+  def withId(id: Option[String]): Link = copy(id = id)
 }
 
 /**
@@ -177,10 +288,7 @@ object Link {
  * @param classes Zero-or-more classes to specify on the image tag.
  */
 case class Image(src: String, alt: String, id: Option[String], classes: Vector[String]) extends Content.Tag {
-
-  /* Return the content. */
-  override def stripped: String = s"($alt)"
-
+  def withId(id: Option[String]): Image = copy(id = id)
 }
 
 /**
@@ -214,6 +322,42 @@ object Image {
 }
 
 /**
+ * Represents a <hr> tag with an optional ID and class list.
+ *
+ * @param id      The optional ID to specify on the hr tag.
+ * @param classes Zero-or-more classes to specify on the hr tag.
+ */
+case class HorizontalRule(id: Option[String], classes: Vector[String]) extends Content.Tag {
+  def withId(id: Option[String]): HorizontalRule = copy(id = id)
+}
+
+/**
+ * Factory for hr content objects.
+ */
+object HorizontalRule {
+
+  /**
+   * Creates a new hr content object.
+   *
+   * @param classes Zero-or-more classes to specify on the hr tag.
+   * @return The new hr content object.
+   */
+  def apply(classes: String*): HorizontalRule =
+    HorizontalRule(None, classes.toVector)
+
+  /**
+   * Creates a new hr content object.
+   *
+   * @param id      The optional ID to specify on the hr tag.
+   * @param classes Zero-or-more classes to specify on the hr tag.
+   * @return The new hr content object.
+   */
+  def apply(id: Option[String], classes: String*): HorizontalRule =
+    HorizontalRule(id, classes.toVector)
+
+}
+
+/**
  * Represents a unit of content wrapped in <cite></cite> tags with an optional ID and class list.
  *
  * @param content The content to wrap with a cite tag.
@@ -221,10 +365,7 @@ object Image {
  * @param classes Zero-or-more classes to specify on the cite tag.
  */
 case class Cite(content: Content, id: Option[String], classes: Vector[String]) extends Content.Tag {
-
-  /* Return the content. */
-  override def stripped: String = content.stripped
-
+  def withId(id: Option[String]): Cite = copy(id = id)
 }
 
 /**
@@ -265,10 +406,7 @@ object Cite {
  */
 case class Quote(cite: Option[String], content: Content, id: Option[String], classes: Vector[String])
   extends Content.Tag {
-
-  /* Return the content. */
-  override def stripped: String = content.stripped
-
+  def withId(id: Option[String]): Quote = copy(id = id)
 }
 
 /**
@@ -311,10 +449,7 @@ object Quote {
  */
 case class Blockquote(cite: Option[String], content: Content, id: Option[String], classes: Vector[String])
   extends Content.Tag {
-
-  /* Return the content. */
-  override def stripped: String = content.stripped
-
+  def withId(id: Option[String]): Blockquote = copy(id = id)
 }
 
 /**
@@ -355,10 +490,7 @@ object Blockquote {
  * @param classes Zero-or-more classes to specify on the span tag.
  */
 case class Span(content: Content, id: Option[String], classes: Vector[String]) extends Content.Tag {
-
-  /* Return the content. */
-  override def stripped: String = content.stripped
-
+  def withId(id: Option[String]): Span = copy(id = id)
 }
 
 /**
@@ -397,12 +529,7 @@ object Span {
  * @param classes Zero-or-more classes to specify on the ordered tag.
  */
 case class Ordered(content: Vector[Item], id: Option[String], classes: Vector[String]) extends Content.Tag {
-
-  /* Return the content. */
-  override def stripped: String = ": " + content.zipWithIndex.map {
-    case (item, index) => s"${index + 1} - ${item.stripped}"
-  }.mkString(", ")
-
+  def withId(id: Option[String]): Ordered = copy(id = id)
 }
 
 /**
@@ -441,11 +568,7 @@ object Ordered {
  * @param classes Zero-or-more classes to specify on the unordered tag.
  */
 case class Unordered(content: Vector[Item], id: Option[String], classes: Vector[String]) extends Content.Tag {
-
-  /* Return the content. */
-  override def stripped: String =
-    ": " + content.map(_.stripped).mkString(", ")
-
+  def withId(id: Option[String]): Unordered = copy(id = id)
 }
 
 /**
@@ -484,10 +607,7 @@ object Unordered {
  * @param classes Zero-or-more classes to specify on the item tag.
  */
 case class Item(content: Content, id: Option[String], classes: Vector[String]) extends Content.Tag {
-
-  /* Return the content. */
-  override def stripped: String = content.stripped
-
+  def withId(id: Option[String]): Item = copy(id = id)
 }
 
 /**
@@ -525,9 +645,6 @@ object Item {
  */
 case class Sequence(content: Vector[Content]) extends Content {
 
-  /* Return the content. */
-  override def stripped: String = content map (_.stripped) mkString " "
-
   /* Concatenate this content with that content taking note of sequences. */
   override def ~(that: Content): Content = that match {
     case Sequence(them) => Sequence(content ++ them)
@@ -560,10 +677,7 @@ object Sequence {
  * @param classes Zero-or-more classes to specify on the section tag.
  */
 case class Section(content: Content, id: Option[String], classes: Vector[String]) extends Content.Tag {
-
-  /* Return the content. */
-  override def stripped: String = content.stripped
-
+  def withId(id: Option[String]): Section = copy(id = id)
 }
 
 /**
@@ -602,10 +716,7 @@ object Section {
  * @param classes Zero-or-more classes to specify on the header tag.
  */
 case class Header(content: Content, id: Option[String], classes: Vector[String]) extends Content.Tag {
-
-  /* Return the content. */
-  override def stripped: String = content.stripped
-
+  def withId(id: Option[String]): Header = copy(id = id)
 }
 
 /**
@@ -644,10 +755,7 @@ object Header {
  * @param classes Zero-or-more classes to specify on the footer tag.
  */
 case class Footer(content: Content, id: Option[String], classes: Vector[String]) extends Content.Tag {
-
-  /* Return the content. */
-  override def stripped: String = content.stripped
-
+  def withId(id: Option[String]): Footer = copy(id = id)
 }
 
 /**
@@ -687,10 +795,7 @@ object Footer {
  * @param classes Zero-or-more classes to specify on the heading tag.
  */
 case class Heading(level: Int, content: Content, id: Option[String], classes: Vector[String]) extends Content.Tag {
-
-  /* Return the content. */
-  override def stripped: String = content.stripped
-
+  def withId(id: Option[String]): Heading = copy(id = id)
 }
 
 /**

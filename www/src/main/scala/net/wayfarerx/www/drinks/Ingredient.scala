@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-package net.wayfarerx.www
-package drinks
-package ingredients
+package net.wayfarerx.www.drinks
+
+import net.wayfarerx.www.{Article, Content}
 
 trait Ingredient extends Article {
 
@@ -30,18 +30,8 @@ trait Ingredient extends Article {
 
   override def content: Vector[Content] = Vector(description)
 
-  override def related: Vector[Content] = Vector()
-
 }
 
 object Ingredient {
-
-}
-
-trait Ingredients extends Subtopic {
-
-}
-
-object Ingredients {
 
 }

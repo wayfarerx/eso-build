@@ -3,37 +3,30 @@
 <head>
   {% include meta.html %}
   <style>
-    main.page-topic header.page-topic-title { background-image: url('/images/{{ page.id }}/banner576.jpg'); }
+    main > header { background-image: url('{{ page.banner-full }}'); }
 
-    @media screen and (min-device-width: 577px) {
-      main.page-topic header.page-topic-title { background-image: url('/images/{{ page.id }}/banner768.jpg'); }
+    @media screen and (max-device-width: 992px) {
+      main > header { background-image: url('{{ page.banner-large }}'); }
     }
 
-    @media screen and (min-device-width: 769px) {
-      main.page-topic header.page-topic-title { background-image: url('/images/{{ page.id }}/banner992.jpg'); }
+    @media screen and (max-device-width: 768px) {
+      main > header { background-image: url('{{ page.banner-medium }}'); }
     }
 
-    @media screen and (min-device-width: 993px) {
-      main.page-topic header.page-topic-title { background-image: url('/images/{{ page.id }}/banner1200.jpg'); }
+    @media screen and (max-device-width: 576px) {
+      main > header { background-image: url('{{ page.banner-small }}'); }
     }
-
-
   </style>
 </head>
-<body>
+<body class="entity composite component topic">
 {% include header.html %}
-<main class="page-topic">
-  <header class="page-topic-title">
-    <h1>{{ page.title }}</h1>
-  </header>
-  {% if page.headline %}
-  <div class="page-topic-headline">
-    <hr>
-    <em>{{ page.headline }}</em>
-    <hr>
-  </div>
-  {% endif %}
+<main class="main">
+  <header><h1>{{ page.title }}</h1></header>
   {{ content }}
+  {% if page.footer %}
+  <hr>
+  <footer>{{ page.footer }}</footer>
+  {% endif %}
 </main>
 {% include footer.html %}
 </body>

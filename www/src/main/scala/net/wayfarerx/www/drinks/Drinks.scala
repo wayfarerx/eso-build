@@ -1,19 +1,24 @@
 package net.wayfarerx.www
 package drinks
 
-import net.wayfarerx.www.drinks.ingredients.{Garnishes, Mixers, Spirits, Wines}
-
 object Drinks extends Topic {
 
-  override def name: String = "drinks"
+  override def displayName: String = "drinks"
 
   override def title: String = "Drinks"
 
   override def description: String = "Drinking is fun."
 
-  override def headline: Option[String] = Some(""""Whisky is liquid sunshine." - George Bernard Shaw""")
+  override def footer: Option[Content] =
+    Some(em(""""I drink to make other people more interesting." - Ernest Hemingway"""))
 
-  override lazy val components: Vector[Component] =
-    Vector(cocktails.Cocktails, Spirits, Wines, Mixers, Garnishes)
+  override lazy val children: Vector[Component] = Vector(
+    cocktails.Cocktails,
+    ingredients.Spirits,
+    ingredients.Wines,
+    ingredients.Mixers,
+    ingredients.Garnishes,
+    glasses.Glasses,
+    tools.Tools)
 
 }

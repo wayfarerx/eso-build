@@ -18,36 +18,7 @@
 
 package net.wayfarerx
 
-import language.implicitConversions
-
 /**
  * Global definitions for the www package.
  */
-package object www {
-
-  /**
-   * Implicit support for entities as a link to another entity.
-   *
-   * @param entity The entity to link to.
-   * @return A link to the specified entity.
-   */
-  implicit def entityToContentLink(entity: Entity): Content =
-    Link(entity.location, entity.title.toLowerCase)
-
-  /**
-   * Implicit support for strings as text content.
-   *
-   * @param content The content to represent.
-   * @return The new text content object.
-   */
-  implicit def stringToTextContent(content: String): Text = Text(content)
-
-  /**
-   * Implicit support for strings as data values.
-   *
-   * @param string The string that should be treated as data.
-   * @return A data value containing the specified string.
-   */
-  implicit def stringToValueData(string: String): Value = Value(string)
-
-}
+package object www extends DataConversions with ContentConversions with ContentDSL

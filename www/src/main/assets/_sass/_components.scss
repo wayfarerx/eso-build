@@ -1,0 +1,29 @@
+
+body.component > main {
+  display: flex;
+  flex-direction: column;
+}
+
+body.component .main > header {
+  background-position: center;
+  background-size: cover;
+  border-bottom: $nav-border;
+  height: 25vh;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  h1 {
+    margin: 0;
+    text-align: center;
+    font-size: 4em;
+  }
+
+  p {
+    font-family: $font-copy;
+    margin: 0;
+    text-align: center;
+  }
+
+}

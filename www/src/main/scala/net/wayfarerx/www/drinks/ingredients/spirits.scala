@@ -6,7 +6,9 @@ sealed trait Spirit extends Ingredient {
 
   final override type Measure = Amount.Liquid
 
-  override def parent: Composite = Spirits
+  override def displayName: String = title.toLowerCase
+
+  override def parent: Option[Composite] = Some(Spirits)
 
 }
 
@@ -51,7 +53,7 @@ object Spirit {
 
   sealed abstract class Whiskey extends Spirit {
 
-    override def parent: Composite = Whiskeys
+    override def parent: Option[Composite] = Some(Whiskeys)
 
   }
 
@@ -81,38 +83,39 @@ object Spirit {
 
   }
 
-  object Whiskeys extends Ingredients {
+  object Whiskeys extends Topic {
 
-    override def parent: Composite = Spirits
+    override def parent: Option[Composite] = Some(Spirits)
 
-    override def name: String = "whiskey"
+    override def displayName: String = title.toLowerCase
 
     override def title: String = "Whiskey"
 
-    override def image: Image = parent.image
-
     override def description: String = "A type of distilled alcoholic beverage made from fermented grain mash."
 
-    override def headline: Option[String] = Some(""""Whisky is liquid sunshine." - George Bernard Shaw""")
+    override def footer: Option[Content] = Some(""""Whisky is liquid sunshine." - George Bernard Shaw""")
 
-    override def components: Vector[Component] = Vector(Whiskey.Bourbon, Whiskey.Rye)
+    override def children: Vector[Component] = Vector(Whiskey.Bourbon, Whiskey.Rye)
 
   }
 
 }
 
-object Spirits extends Ingredients {
+object Spirits extends Topic {
 
-  override def parent: Composite = Drinks
+  override def parent: Option[Composite] = Some(Drinks)
 
-  override def name: String = "spirits"
+  override def displayName: String = title.toLowerCase
 
   override def title: String = "Spirits"
 
-  override def image: Image = parent.image
-
   override def description: String = "Drinking is fun."
 
-  override def headline: Option[String] = Some(""""Whisky is liquid sunshine." - George Bernard Shaw""")
+  override def children: Vector[Component] = Vector(
+    Spirit.Gin,
+    Spirit.Rum,
+    Spirit.Tequila,
+    Spirit.Vodka,
+    Spirit.Whiskeys)
 
 }

@@ -1,7 +1,7 @@
 
 $foot-border: 1px solid #616161;
 
-footer.page-footer {
+body > footer {
   align-items: center;
   background: linear-gradient(#343940, #2e3238);
   border: $foot-border;
@@ -9,7 +9,7 @@ footer.page-footer {
   flex-direction: column;
   padding: .5em;
 
-  address.page-footer-links {
+  address {
     align-items: center;
     display: flex;
 
@@ -21,7 +21,7 @@ footer.page-footer {
 
   }
 
-  small.page-footer-copyright {
+  small {
     margin: 0;
     padding-top: .5em;
     text-align: center;
@@ -31,9 +31,9 @@ footer.page-footer {
 
 @media (min-width: 577px) {
 
-  footer.page-footer {
+  body > footer {
 
-    address.page-footer-links {
+    address {
       font-size: 1.45em;
     }
 

@@ -2,46 +2,41 @@ package net.wayfarerx.www
 package drinks
 package cocktails
 
-import net.wayfarerx.www.drinks.ingredients.Ingredient
+import glasses.Glass
+import tools.Tool
 
 abstract class Cocktail extends Article {
 
-  final type Component[+T <: Ingredient] = Cocktail.Component[T]
-
-  final type Style = Cocktail.Style
-
-  final def Component: Cocktail.Component.type = Cocktail.Component
-
-  final def Style: Cocktail.Style.type = Cocktail.Style
-
-  def style: Style
+  def kind: Cocktail.Kind
 
   def glass: Glass
 
-  def components: Vector[Component[Ingredient]]
-
   def tools: Vector[Tool]
+
+  def components: Vector[Cocktail.Component[Ingredient]]
 
   def instructions: Vector[Content]
 
   def references: Vector[Link]
 
-  override def parent: Composite = Cocktails
+  override def parent: Option[Composite] = Some(Cocktails)
 
-  override def headline: Option[String] = style match {
-    case Cocktail.Style.BeforeDinner => Some("A Before Dinner Cocktail")
+  override def style: Option[String] = Some("cocktail")
+
+  override def headline: Option[String] = kind match {
+    case Cocktail.Kind.BeforeDinner => Some("A Before Dinner Cocktail")
   }
 
   override def author: Option[String] = None
 
   override def content: Vector[Content] = Vector(
-    "Ingredients needed:" ~ Unordered(components map (c => Item(c.amount.toString ~ s" ${c.ingredient.title}"))),
-    "Hardware required:" ~ Unordered(Item(glass.toString) +: tools.map(t => Item(t.toString))),
-    "Assembly procedure:" ~ Ordered(instructions map (Item(_))),
+    "Ingredients needed:" ~ ul(components map (c => li(c.amount.toString ~ s" ${c.ingredient.displayName}")): _*),
+    "Hardware required:" ~ ul(li(glass.displayName) +: tools.map(t => li(t.displayName)): _*),
+    "Assembly procedure:" ~ ol(instructions map (li(_)): _*),
     image
   )
 
-  override def related: Vector[Content] = references
+  override def footer: Option[Content] = Some(Sequence(references))
 
 }
 
@@ -49,30 +44,26 @@ object Cocktail {
 
   case class Component[+T <: Ingredient](ingredient: T, amount: T#Measure)
 
-  sealed trait Style
+  sealed trait Kind
 
-  object Style {
+  object Kind {
 
-    case object BeforeDinner extends Style
+    case object BeforeDinner extends Kind
 
   }
 
 }
 
-object Cocktails extends Subtopic {
+object Cocktails extends Topic {
 
-  override def parent: Composite = Drinks
+  override def parent: Option[Composite] = Some(Drinks)
 
-  override def name: String = "cocktails"
+  override def displayName = "cocktails"
 
-  override def title: String = "Cocktails"
+  override def title = "Cocktails"
 
-  override def image: Image = Drinks.image
+  override def description = "Drinking is fun."
 
-  override def description: String = "Drinking is fun."
-
-  override def headline: Option[String] = Some(""""Whisky is liquid sunshine." - George Bernard Shaw""")
-
-  override def components: Vector[Component] = Vector(Manhattan)
+  override def children: Vector[Component] = Vector(Manhattan)
 
 }

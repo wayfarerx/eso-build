@@ -5,75 +5,107 @@ import cats.effect.IO
 
 import fs2.Stream
 
-object ContentRenderer extends Renderer[Content] {
+trait ContentRenderer {
 
-  override def render(value: Content): Stream[IO, String] = value match {
+  /** The content rendering strategy. */
+  implicit final val contentRenderer: Renderer[Content] = {
 
     case Text(content) =>
       Stream(content)
 
+    case Emphasis(content, id, classes) =>
+      enclose("em", id, classes)(content)
+
+    case Strong(content, id, classes) =>
+      enclose("strong", id, classes)(content)
+
     case Paragraph(content, id, classes) =>
-      open("p", id, classes) ++ render(content) ++ close("p")
+      enclose("p", id, classes)(content)
+
+    case Div(content, id, classes) =>
+      enclose("div", id, classes)(content)
 
     case Link(href, content, id, classes) =>
-      open("a", id, classes, "href" -> href) ++ render(content) ++ close("a")
+      enclose("a", id, classes, "href" -> href)(content)
 
     case Image(src, alt, id, classes) =>
-      open("img", id, classes, "src" -> src, "alt" -> alt)
+      tag("img", id, classes, "src" -> src, "alt" -> alt)
+
+    case HorizontalRule(id, classes) =>
+      tag("hr", id, classes)
 
     case Cite(content, id, classes) =>
-      open("cite", id, classes) ++ render(content) ++ close("cite")
+      enclose("cite", id, classes)(content)
 
     case Quote(cite, content, id, classes) =>
-      open("q", id, classes, cite.map("cite" -> _).toSeq: _*) ++ render(content) ++ close("q")
+      enclose("q", id, classes, cite.map("cite" -> _).toSeq: _*)(content)
 
     case Blockquote(cite, content, id, classes) =>
-      open("blockquote", id, classes, cite.map("cite" -> _).toSeq: _*) ++ render(content) ++ close("blockquote")
+      enclose("blockquote", id, classes, cite.map("cite" -> _).toSeq: _*)(content)
 
     case Span(content, id, classes) =>
-      open("span", id, classes) ++ render(content) ++ close("span")
+      enclose("span", id, classes)(content)
 
     case Ordered(content, id, classes) =>
-      open("ol", id, classes) ++ Stream.emits(content).flatMap(render(_)) ++ close("ol")
+      enclose("ol", id, classes)(content: _*)
 
     case Unordered(content, id, classes) =>
-      open("ul", id, classes) ++ Stream.emits(content).flatMap(render(_)) ++ close("ul")
+      enclose("ul", id, classes)(content: _*)
 
     case Item(content, id, classes) =>
-      open("li", id, classes) ++ render(content) ++ close("li")
+      enclose("li", id, classes)(content)
 
     case Section(content, id, classes) =>
-      open("section", id, classes) ++ render(content) ++ close("section")
+      enclose("section", id, classes)(content)
 
     case Header(content, id, classes) =>
-      open("header", id, classes) ++ render(content) ++ close("header")
+      enclose("header", id, classes)(content)
 
     case Footer(content, id, classes) =>
-      open("footer", id, classes) ++ render(content) ++ close("footer")
+      enclose("footer", id, classes)(content)
 
     case Heading(level, content, id, classes) =>
-      open(s"h$level", id, classes) ++ render(content) ++ close(s"h$level")
+      enclose(s"h$level", id, classes)(content)
 
     case Sequence(content) =>
-      Stream.emits(content).flatMap(render(_))
+      Stream emits content flatMap contentRenderer.render
 
   }
 
-  private def open(
+  private def tag(
     tag: String,
     id: Option[String],
     classes: Vector[String],
     attributes: (String, String)*): Stream[IO, String] =
-    Stream(s"<$tag") ++
+    emit(tag, id, classes, attributes.toVector, None)
+
+  private def enclose(
+    tag: String,
+    id: Option[String],
+    classes: Vector[String],
+    attributes: (String, String)*)(
+    content: Content*): Stream[IO, String] =
+    emit(tag, id, classes, attributes.toVector, Some(Sequence(content.toVector)))
+
+  private def emit(
+    tag: String,
+    id: Option[String],
+    classes: Vector[String],
+    attributes: Vector[(String, String)],
+    enclosed: Option[Content]): Stream[IO, String] = {
+    Stream(s"<$tag").covary[IO] ++
       Stream.emits(id.toSeq).map(escapeQuotes).map(i => s""" id="$i"""") ++ {
       if (classes.isEmpty) Stream.empty
       else Stream(""" class="""") ++ Stream.emits(classes).map(escapeQuotes).intersperse(" ") ++ Stream(""""""")
     } ++ Stream.emits(attributes.toSeq).map {
       case (k, v) => s""" $k="${escapeQuotes(v)}""""
-    } ++ Stream(">")
-
-  private def close(tag: String): Stream[IO, String] =
-    Stream(s"</$tag>")
+    } ++ Stream(">") ++ {
+      enclosed match {
+        case Some(content) => content.render ++ Stream(s"</$tag>")
+        case None => Stream.empty
+      }
+    }
+  }
 
   private def escapeQuotes(str: String): String =
     str.replace(""""""", "&quot;")

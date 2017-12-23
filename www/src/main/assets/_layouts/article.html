@@ -2,22 +2,40 @@
 <html>
 <head>
   {% include meta.html %}
+  <style>
+    main > article > header { background-image: url('{{ page.banner-full }}'); }
+
+    @media screen and (max-device-width: 992px) {
+      main > article > header { background-image: url('{{ page.banner-large }}'); }
+    }
+
+    @media screen and (max-device-width: 768px) {
+      main > article > header { background-image: url('{{ page.banner-medium }}'); }
+    }
+
+    @media screen and (max-device-width: 576px) {
+      main > article > header { background-image: url('{{ page.banner-small }}'); }
+    }
+
+  </style>
 </head>
-<body>
+<body class="entity component article{% if page.style %} {{ page.style }}{% endif %}">
 {% include header.html %}
 <main>
-  <article>
+  <article class="main">
     <header>
       <h1>{{ page.title }}</h1>
-      <p>{{ page.headline }} by
-        <a href="https://twitter.com/{% if page.twitter %}{{ page.twitter }}{% else %}{{ site.twitter }}{% endif %}">
-          @{% if page.twitter %}{{ page.twitter }}{% else %}{{ site.twitter }}{% endif %}</a></p>
+      {% if page.twitter %}
+      <p>{% if page.headline %}{{ page.headline }} by
+        {% endif %}<a href="https://twitter.com/{{ page.twitter }}">@{{ page.twitter }}</a></p>
+      {% else %}
+      {% if page.headline %}<p>{{ page.headline }}</p>{% endif %}
+      {% endif %}
     </header>
     {{ content }}
-    {% if page.references %}
+    {% if page.footer %}
     <footer>
-      Further reading:
-      <ul>{% for pair in page.references %}<li><a href="{{ pair.link }}">{{ pair.text }}</a></li>{% endfor %}</ul>
+      Further reading: {{ page.footer }}
     </footer>
     {% endif %}
   </article>

@@ -1,11 +1,9 @@
 package net.wayfarerx.www
 
-import net.wayfarerx.www.drinks.ingredients.Ingredient
+import net.wayfarerx.www.drinks.Ingredient
 import net.wayfarerx.www.drinks.cocktails.Cocktail
 
 package object drinks {
-
-  val Category = "drinks"
 
   val Dash = 0.061611519922
 
