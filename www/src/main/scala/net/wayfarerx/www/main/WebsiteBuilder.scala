@@ -96,7 +96,23 @@ object WebsiteBuilder extends App {
 
       override def description: String = "The misadventures of wayfarerx."
 
-      override def children: Vector[Component] = Vector(Drinks)
+      override def children: Vector[Component] = Vector(
+        Drinks,
+        new Topic {
+          override def displayName: String = "games"
+          override def title: String = "Games"
+          override def description: String = "Gaming is fun."
+        },
+        new Topic {
+          override def displayName: String = "code"
+          override def title: String = "Code"
+          override def description: String = "Hacking is fun."
+        },
+        new Topic {
+          override def displayName: String = "thoughts"
+          override def title: String = "Thoughts"
+          override def description: String = "Thinking is fun."
+        })
 
     }
 

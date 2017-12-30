@@ -1,0 +1,164 @@
+
+$landing-heading-font: normal normal normal 'IM Fell Great Primer', serif;
+
+$landing-link-border: 1px solid $link-color;
+
+$landing-fade-in: landing-fade-in .5s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+
+$landing-hover-duration: .3s;
+$landing-hover-rise: .66vh;
+
+$landing-text-shadow: 0 0 .80em #000000;
+$landing-text-shadow-big: 0 $landing-hover-rise 1em #000000;
+
+@keyframes landing-fade-in {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+body.landing {
+
+  .main {
+    margin: 0;
+    min-height: 100vh;
+    min-width: 100vw;
+    padding: 0 7vw;
+    text-shadow: $landing-text-shadow;
+
+    display: flex;
+    justify-content: space-between;
+
+    h1 {
+      color: $link-color;
+      font: $landing-heading-font;
+      font-size: 4em;
+      margin: auto;
+      padding: 0 2vw 0 0;
+      width: 43vw;
+      animation: $landing-fade-in;
+      animation-delay: .1s;
+    }
+
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      width: 43vw;
+
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+
+      li {
+        opacity: 0;
+        height: 50vh;
+        width: 21.5vw;
+        animation: $landing-fade-in;
+        background-color: #346a6300;
+        transition-duration: $landing-hover-duration;
+        transition-property: background-color;
+
+        display: flex;
+        flex-direction: column;
+
+        a {
+          background: transparent;
+          padding: 2vw;
+          text-decoration: none;
+          width: 100%;
+          height: 100%;
+          transition-duration: $landing-hover-duration;
+          transition-property: text-shadow;
+
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-end;
+
+          h2 {
+            font: $landing-heading-font;
+            font-size: 2em;
+          }
+
+          p {
+            font-size: 1.25em;
+          }
+
+        }
+
+        a::after {
+          content: ' ';
+          display: block;
+          height: 0;
+          transition-duration: $landing-hover-duration;
+          transition-property: height;
+        }
+
+      }
+
+      li:hover {
+        background-color: #346a6349;
+        text-shadow: $landing-text-shadow-big;
+
+        a::after {
+          height: $landing-hover-rise;
+        }
+      }
+
+      li:nth-child(1) {
+        animation-delay: .2s;
+
+        a {
+          border-left: $landing-link-border;
+        }
+      }
+
+      li:nth-child(2) {
+        animation-delay: .3s;
+
+        a {
+          border-left: $landing-link-border;
+          border-right: $landing-link-border;
+        }
+      }
+
+      li:nth-child(3) {
+        animation-delay: .3s;
+
+        a {
+          border-left: $landing-link-border;
+          border-top: $landing-link-border;
+        }
+      }
+
+      li:nth-child(4) {
+        animation-delay: .4s;
+
+        a {
+          border-left: $landing-link-border;
+          border-top: $landing-link-border;
+          border-right: $landing-link-border;
+        }
+      }
+
+    }
+
+  }
+
+  .main::after {
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    content: ' ';
+    display: block;
+    opacity: 0;
+    top: 0;
+    left: 0;
+    min-height: 100vh;
+    min-width: 100vw;
+    position: fixed;
+    z-index: -1;
+    animation: landing-fade-in .9s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+  }
+
+}

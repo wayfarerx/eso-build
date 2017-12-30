@@ -3,24 +3,19 @@
 <head>
   {% include meta.html %}
   <style>
-    img.landing
-    {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-    @media screen and (orientation: portrait) {
-      img.landing { max-width: 90%; }
-    }
-    @media screen and (orientation: landscape) {
-      img.landing { max-height: 90%; }
-    }
+    @media screen {
+      .main::after { background-image: url('{{ page.banner-large }}'); } }
+    @media screen and (max-width: 1536px) and (max-height: 1536px) {
+      .main::after { background-image: url('{{ page.banner-medium }}'); } }
+    @media screen and (max-width: 768px) and (max-height: 768px) {
+      .main::after { background-image: url('{{ page.banner-small }}'); } }
   </style>
 </head>
-<body>
-  <main>
+<body class="entity composite landing">
+  <main class="main">
+    <h1>wayfarerx.net</h1>
     {{ content }}
   </main>
+  {% include scripts.html %}
 </body>
 </html>

@@ -5,15 +5,15 @@
   <style>
     main > header { background-image: url('{{ page.banner-full }}'); }
 
-    @media screen and (max-device-width: 992px) {
+    @media screen and (max-width: 992px) {
       main > header { background-image: url('{{ page.banner-large }}'); }
     }
 
-    @media screen and (max-device-width: 768px) {
+    @media screen and (max-width: 768px) {
       main > header { background-image: url('{{ page.banner-medium }}'); }
     }
 
-    @media screen and (max-device-width: 576px) {
+    @media screen and (max-width: 576px) {
       main > header { background-image: url('{{ page.banner-small }}'); }
     }
   </style>
@@ -29,5 +29,6 @@
   {% endif %}
 </main>
 {% include footer.html %}
+{% include scripts.html %}
 </body>
 </html>

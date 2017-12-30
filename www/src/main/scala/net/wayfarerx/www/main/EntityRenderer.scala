@@ -34,8 +34,8 @@ trait EntityRenderer {
         Map[String, Data]("category" -> category)
       }
       val (frontMatter, content): (Map[String, Data], Stream[IO, Content]) = entity match {
-        case _: Landing => Map[String, Data]() ->
-          Stream(Image("/images/home.png", "wayfarerx logo", "landing")) // FIXME
+        case landing: Landing => Map[String, Data]() ->
+          Stream(ul(landing.children.map(child => li(a(child.location, h2(child.title) ~ p(child.description)))): _*))
         case topic: Topic => Map[String, Data]() ->
           componentsToContent(topic.children)
         case article: Article => (
