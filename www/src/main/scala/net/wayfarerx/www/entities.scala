@@ -78,13 +78,13 @@ object Entity {
 
     /** The unique ID of the entity. */
     def path: String = entity match {
-      case _: Landing => ""
+      case _: Home => ""
       case other => category map (c => s"$c/${other.name}") getOrElse other.name
     }
 
     /** The location that points to the entity. */
     def location: String = entity match {
-      case _: Landing => "/"
+      case _: Home => "/"
       case _ => s"/$path/"
     }
 
@@ -146,12 +146,12 @@ sealed trait Composite extends Entity {
 }
 
 /**
- * Base class for the root landing page.
+ * Base class for the root home page.
  */
-trait Landing extends Composite {
+trait Home extends Composite {
 
-  /* Use the landing template. */
-  final override def layout: String = "landing"
+  /* Use the home template. */
+  final override def layout: String = "home"
 
 }
 

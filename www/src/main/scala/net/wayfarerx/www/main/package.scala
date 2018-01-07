@@ -88,7 +88,7 @@ package object main {
     def targetDirectory: Directory
 
     /** The home page of the site. */
-    def homePage: Landing
+    def homePage: Home
 
   }
 

@@ -1,70 +1,71 @@
 
 $background-color: #262216;
-$link-color: #b0a18e;
-$hover-color: #beb2a2;
-$active-color: #b8f1d4;
-$visited-color: #b0a18e;
 $container-color: #49412c;
 $highlight-color: #97743a;
-$text-color: #c8c8c8;
 
-//
-//
-//
+$link-color: #b0a18e;
+$hover-color: #beb2a2;
+$active-color: #ccc3b7;
+$visited-color: #a09382;
 
-$body-color: #15171a;
+$text-color: #928677;
+$shadow-color: #000000;
+$feature-color: #0a260a;
 
-$dark-to-light-gradient: linear-gradient(#2e3238, #343940);
-$dark-to-light-gradient-active: linear-gradient(#343940, #3a4047);
+$background-color-fade: .3;
 
-$nav-border: 1px solid #616161;
+$headline-font: normal normal normal 1em 'IM Fell Great Primer', serif;
+$lead-font: normal normal bold 1em 'Raleway', sans-serif;
+$copy-font: normal normal normal 1em 'Raleway', sans-serif;
 
-$size-tiny: 288px;
-$size-small: 576px;
-$size-medium: 768px;
-$size-large: 992px;
-$size-full: 1200px;
+$small-max-size: 768px;
+$medium-min-size: 769px;
+$medium-max-size: 1536px;
+$large-min-size: 1537px;
 
-$image-size: 512px;
+@media screen {
 
-$font-headline: 'Trirong', serif;
-$font-copy: 'Rubik', sans-serif;
+  *, *:before, *:after {
+    box-sizing: inherit;
+  }
 
-*, *:before, *:after {
-  box-sizing: inherit;
-}
+  html {
+    box-sizing: border-box;
+  }
 
-html {
-  box-sizing: border-box;
-}
+  html, body {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    min-width: 100vw;
+  }
 
-html, body {
-  margin: 0;
-  min-height: 100vh;
-  min-width: 100vw;
-}
+  body {
+    background-color: $background-color;
+    color: $text-color;
+    font: $copy-font;
+    font-size: 100%;
 
-body {
-  background-color: $background-color;
-  font-size: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
 
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
+  a:link {
+    color: $link-color;
+  }
 
-a:link {
-  color: $link-color;
-}
+  a:visited {
+    color: $visited-color;
+  }
 
-a:visited {
-  color: $visited-color;
-}
+  a:hover {
+    color: $hover-color;
+  }
 
-a:hover {
-  color: $hover-color;
-}
+  a:active {
+    color: $active-color;
+  }
 
-a:active {
-  color: $active-color;
 }

@@ -85,8 +85,8 @@ object WebsiteBuilder extends App {
           new Thread(group, r, s"${group.getName}-${counter.incrementAndGet()}")
       }))
 
-    /** The root landing page in the website. */
-    override val homePage: Landing = new Landing {
+    /** The root home page in the website. */
+    override val homePage: Home = new Home {
 
       override def name: String = "home"
 

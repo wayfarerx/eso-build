@@ -15,6 +15,23 @@ forums:  wayfarerx
 
 streaming_url:  https://www.twitch.tv/wayfarer_x
 
+links:
+  - url: https://twitter.com/thewayfarerx
+    title: Twitter
+    icon: fa-twitter
+  - url: https://github.com/wayfarerx
+    title: Github
+    icon: fa-github-alt
+  - url: https://www.youtube.com/channel/UCjx8a2ya26OK-lrcisYDQSw
+    title: YouTube
+    icon: fa-youtube
+  - url: https://www.twitch.tv/wayfarer_x
+    title: Twitch
+    icon: fa-twitch
+  - url: mailto:x@wayfarerx.net
+    title: Email
+    icon: fa-envelope
+
 markdown: kramdown
 
 exclude: [vendor]

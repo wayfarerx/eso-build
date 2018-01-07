@@ -16,4 +16,11 @@ lazy val www = (project in file("www")).
     libraryDependencies += scalaTest % Test
   )
 
+lazy val tools = (project in file("tools")).
+  settings(
+    common,
+    name := "tools",
+    libraryDependencies += scalaTest % Test
+  )
+
 run in Compile <<= (run in Compile in www)

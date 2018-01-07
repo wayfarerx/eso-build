@@ -56,7 +56,7 @@ trait PageGenerator {
    * @return The effectual stream of entity discovery.
    */
   private def findAllEntities(entity: Entity): Stream[IO, (Directory, Entity)] = entity match {
-    case landing: Landing =>
+    case landing: Home =>
       Stream(targetDirectory -> landing) ++
         Stream.emits(landing.children).flatMap(findAllEntities)
     case topic: Topic =>

@@ -1,0 +1,442 @@
+
+$entity-transition-speed: .3s;
+
+$entity-link-rise: .33em;
+$entity-hover-rise: .66em;
+$entity-active-rise: .1em;
+
+$entity-link-shadow: 0 $entity-link-rise .5em $shadow-color;
+$entity-hover-shadow: 0 $entity-hover-rise 1em $shadow-color;
+$entity-active-shadow: 0 $entity-active-rise .25em $shadow-color;
+
+$entity-feature-border: 1px solid $text-color;
+
+@mixin entity-fade-in($delay, $duration) {
+  animation: entity-fade-in $duration ease-in $delay 1 normal backwards;
+}
+
+@mixin entity-shadow-rise($delay, $duration) {
+  animation: entity-shadow-rise $duration ease-in $delay 1 normal backwards;
+}
+
+@mixin entity-rise-up($delay, $duration) {
+  animation: entity-rise-up $duration ease-in $delay 1 normal backwards;
+}
+
+@media screen {
+
+  @keyframes entity-fade-in {
+    0%   { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  @keyframes entity-shadow-rise {
+    0% { text-shadow: $entity-active-shadow; }
+    100% { text-shadow: $entity-link-shadow; }
+  }
+
+  @keyframes entity-rise-up {
+    0%   { height: $entity-active-rise; }
+    100% { height: $entity-link-rise; }
+  }
+
+  /*
+   * Styles for the banner image.
+   */
+
+  body.entity::after {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    z-index: -1;
+    content: ' ';
+
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+
+    @include entity-fade-in(.2s, .8s);
+  }
+
+  /*
+   * Styles for the header block.
+   */
+
+  body.entity > header {
+    border: 0;
+    margin: 0;
+    padding: 0 7vw;
+    min-width: 100vw;
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: space-between;
+
+    a {
+      text-decoration: none;
+    }
+
+    @media (max-width: $small-max-size) {
+      padding: 7vh 0;
+
+      flex-direction: column;
+    }
+  }
+
+  /*
+   * Styles for the left/top side of the header block.
+   */
+
+  body.entity > header > div {
+    border: 0;
+    margin: 0;
+    padding: 0;
+
+    @media (max-width: $small-max-size) {
+      height: 28vh;
+      align-items: center;
+    }
+
+    @media (min-width: $medium-min-size) {
+      width: 43vw;
+    }
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+
+    div {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      h1 {
+        color: $link-color;
+        font: $headline-font;
+        font-size: 4em;
+        margin: 0;
+        text-shadow: $entity-link-shadow;
+
+        @media (max-width: $medium-max-size) {
+          font-size: 3em;
+        }
+
+        @include entity-fade-in(0s, .7s);
+      }
+
+      ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        min-height: 4em;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+
+        li {
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-end;
+          flex-grow: 1;
+
+          a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+
+            i {
+              font-size: 2em;
+              text-shadow: $entity-link-shadow;
+              transition-duration: $entity-transition-speed;
+              transition-property: text-shadow;
+
+              @media (max-width: $medium-max-size) {
+                font-size: 1.5em;
+              }
+
+            }
+
+          }
+
+          a::after {
+            content: ' ';
+            display: block;
+            height: $entity-link-rise;
+
+            transition-duration: $entity-transition-speed;
+            transition-property: height;
+          }
+
+        }
+
+        li:nth-child(1) {
+          a {
+            @include entity-fade-in(.2s, .3s);
+            i { @include entity-shadow-rise(.3s, .3s) }
+          }
+          a::after { @include entity-rise-up(.3s, .3s) }
+        }
+
+        li:nth-child(2) {
+          a {
+            @include entity-fade-in(.3s, .3s);
+            i { @include entity-shadow-rise(.4s, .3s) }
+          }
+          a::after { @include entity-rise-up(.4s, .3s) }
+        }
+
+        li:nth-child(3) {
+          a {
+            @include entity-fade-in(.4s, .3s);
+            i { @include entity-shadow-rise(.5s, .3s) }
+          }
+          a::after { @include entity-rise-up(.5s, .3s) }
+        }
+
+        li:nth-child(4) {
+          a {
+            @include entity-fade-in(.5s, .3s);
+            i { @include entity-shadow-rise(.6s, .3s) }
+          }
+          a::after { @include entity-rise-up(.6s, .3s) }
+        }
+
+        li:nth-child(5) {
+          a {
+            @include entity-fade-in(.6s, .3s);
+            i { @include entity-shadow-rise(.7s, .3s) }
+          }
+          a::after { @include entity-rise-up(.7s, .3s) }
+        }
+
+        li:hover {
+
+          a i {
+            text-shadow: $entity-hover-shadow;
+          }
+
+          a::after {
+            height: $entity-hover-rise;
+          }
+
+        }
+
+        li:active {
+
+          a i {
+            text-shadow: $entity-active-shadow;
+          }
+
+          a::after {
+            height: $entity-active-rise;
+          }
+
+        }
+
+      }
+
+    }
+  }
+
+  /* Styles for the right/bottom side of the header block. */
+  body.entity > header > nav {
+    border: 0;
+    margin: 0;
+    padding: 0;
+
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+
+    @media (max-width: $small-max-size) {
+      height: 58vh;
+    }
+
+    @media (min-width: $medium-min-size) {
+      width: 43vw;
+    }
+
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      flex-grow: 1;
+
+      @media (max-width: $small-max-size) {
+        flex-direction: column;
+      }
+
+      li {
+        background-color: rgba($feature-color, 0);
+        transition-duration: $entity-transition-speed;
+        transition-property: background-color;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        @media (max-width: $small-max-size) {
+          width: 50vw;
+          height: 29vh;
+        }
+
+        @media (min-width: $medium-min-size) {
+          width: 50%;
+          height: 50vh;
+        }
+
+        a {
+          padding: 2em;
+
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-end;
+          flex-grow: 1;
+
+          h2 {
+            font: $headline-font;
+            font-size: 1.75em;
+            text-shadow: $entity-link-shadow;
+            transition-duration: $entity-transition-speed;
+            transition-property: text-shadow;
+
+            @media (max-width: $medium-max-size) {
+              font-size: 1.3em;
+            }
+          }
+
+          p {
+            font: $lead-font;
+            font-size: 1.25em;
+            text-shadow: $entity-link-shadow;
+            transition-duration: $entity-transition-speed;
+            transition-property: text-shadow;
+
+            @media (max-width: $medium-max-size) {
+              font-size: 1em;
+            }
+          }
+
+        }
+
+        a::after {
+          content: ' ';
+          display: block;
+          height: $entity-link-rise;
+          transition-duration: $entity-transition-speed;
+          transition-property: height;
+        }
+
+      }
+
+      li:hover {
+        background-color: rgba($feature-color, $background-color-fade);
+
+        a {
+          h2, p {
+            text-shadow: $entity-hover-shadow;
+          }
+        }
+
+        a::after {
+          height: $entity-hover-rise;
+        }
+
+      }
+
+      li:active {
+
+        a {
+          h2, p {
+            text-shadow: $entity-active-shadow;
+          }
+        }
+
+        a::after {
+          height: $entity-active-rise;
+        }
+
+      }
+
+      li:nth-child(1) {
+        border-right: $entity-feature-border;
+        border-bottom: $entity-feature-border;
+        @include entity-fade-in(.1s, .6s);
+
+        @media (max-width: $small-max-size) {
+          border-top: $entity-feature-border;
+        }
+
+        @media (min-width: $medium-min-size) {
+          border-left: $entity-feature-border;
+        }
+
+        a {
+          h2, p { @include entity-shadow-rise(.2s, .6s) }
+        }
+        a::after { @include entity-rise-up(.2s, .6s) }
+      }
+
+      li:nth-child(2) {
+        border-right: $entity-feature-border;
+        border-bottom: $entity-feature-border;
+        @include entity-fade-in(.2s, .6s);
+
+        a {
+          h2, p { @include entity-shadow-rise(.3s, .6s) }
+        }
+        a::after { @include entity-rise-up(.3s, .6s) }
+      }
+
+      li:nth-child(3) {
+        @include entity-fade-in(.2s, .6s);
+
+        @media (max-width: $small-max-size) {
+          border-top: $entity-feature-border;
+          border-bottom: $entity-feature-border;
+        }
+
+        @media (min-width: $medium-min-size) {
+          border-left: $entity-feature-border;
+          border-right: $entity-feature-border;
+        }
+
+        a {
+          h2, p { @include entity-shadow-rise(.3s, .6s) }
+        }
+        a::after { @include entity-rise-up(.3s, .6s) }
+      }
+
+      li:nth-child(4) {
+        @include entity-fade-in(.3s, .6s);
+
+        @media (max-width: $small-max-size) {
+          border-bottom: $entity-feature-border;
+        }
+
+        @media (min-width: $medium-min-size) {
+        border-right: $entity-feature-border;
+        }
+
+        a {
+          h2, p { @include entity-shadow-rise(.4s, .6s) }
+        }
+        a::after { @include entity-rise-up(.4s, .6s) }
+      }
+
+    }
+
+  }
+
+}
