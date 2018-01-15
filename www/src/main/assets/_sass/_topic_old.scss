@@ -1,0 +1,113 @@
+
+$topic-spacing: 1.5em;
+
+body.topic > main > section {
+  padding: $topic-spacing;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+
+  @media (min-width: $size-small) {
+    font-size: 1.2em;
+  }
+
+  @media (min-width: $size-medium) {
+    font-size: 1.45em;
+
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  @media (min-width: $size-large) {
+    font-size: 1.75em;
+  }
+
+  div {
+    width: 100%;
+    max-width: $image-size;
+
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    order: 1;
+
+    @media (min-width: $size-medium) {
+      max-width: 50%;
+    }
+
+    h2 {
+      font-weight: 300;
+      font-family: $font-headline;
+      line-height: 1;
+      letter-spacing: -1px;
+
+      @media (min-width: $size-small) {
+        font-size: 1.2em;
+      }
+
+      @media (min-width: $size-medium) {
+        font-size: 1.45em;
+      }
+
+      @media (min-width: $size-large) {
+        font-size: 1.75em;
+      }
+
+      a {
+        text-decoration: none;
+      }
+
+    }
+
+  }
+
+  img {
+    flex-grow: 1;
+    border: $nav-border;
+    width: $image-size;
+    max-width: 100%;
+    max-height: $image-size;
+  }
+
+}
+
+body.topic > main > section > a {
+  min-width: 0;
+  margin-top: $topic-spacing;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  order: 2;
+}
+
+@media (min-width: $size-medium) {
+
+  body.topic > main > section > .left {
+    order: 0;
+    margin-right: $topic-spacing;
+    margin-top: 0;
+  }
+
+  body.topic > main > section > .right {
+    margin-left: $topic-spacing;
+    margin-top: 0;
+  }
+
+}
+
+body.topic > main > hr {
+  border: $nav-border;
+  height: 1px;
+  margin: 0 $topic-spacing;
+}
+
+body.topic > main > footer {
+  align-items: center;
+  padding: 2em;
+
+  display: flex;
+  flex-direction: column;
+}

@@ -1,0 +1,15 @@
+<ul>
+  {% for item in page.toc %}
+  <li><a href="{{ item.url }}">
+    {% if item.image %}
+    <img src="{{ item.image.src }}" alt="{{ item.image.alt }}">
+    {% endif %}
+    <h2>{{ item.title }}</h2>
+    {% if item.lead %}
+    {{ item.lead }}
+    {% else %}
+    <p>{{ item.description }}</p>
+    {% endif %}
+  </a></li>
+  {% endfor %}
+</ul>

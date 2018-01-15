@@ -12,3 +12,11 @@
 <meta property="og:image" content="{% if page.image %}{{ page.image }}{% else %}{{ site.image }}{% endif %}"/>
 <meta property="og:image:alt" content="{% if page.image %}{{ page.image-alt }}{% else %}{{ site.image-alt }}{% endif %}"/>
 <link rel="stylesheet" href="/css/wayfarerx.css" />
+<style>
+  @media screen {
+    body::after { background-image: url('{{ page.banner-large }}'); } }
+  @media screen and (max-width: 1536px) and (max-height: 1536px) {
+    body::after { background-image: url('{{ page.banner-medium }}'); } }
+  @media screen and (max-width: 768px) and (max-height: 768px) {
+    body::after { background-image: url('{{ page.banner-small }}'); } }
+</style>

@@ -23,22 +23,107 @@ $entity-feature-border: 1px solid $text-color;
   animation: entity-rise-up $duration ease-in $delay 1 normal backwards;
 }
 
+@mixin entity-lead() {
+  font: $lead-font;
+  font-size: 1.25em;
+  text-shadow: $entity-link-shadow;
+  transition-duration: $entity-transition-speed;
+  transition-property: text-shadow;
+
+  @media (max-width: $medium-max-size) {
+    font-size: 1em;
+  }
+
+}
+
+@mixin entity-links() {
+
+  li {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    flex-grow: 1;
+
+    a {
+      text-decoration: none;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+
+      @include entity-fade-in(.2s, .3s);
+
+      i {
+        font-size: 2em;
+        text-shadow: $entity-link-shadow;
+        transition-duration: $entity-transition-speed;
+        transition-property: text-shadow;
+
+        @media (max-width: $medium-max-size) {
+          font-size: 1.5em;
+        }
+
+        @include entity-shadow-rise(.2s, .3s);
+
+      }
+
+    }
+
+    a::after {
+      content: ' ';
+      display: block;
+      height: $entity-link-rise;
+
+      transition-duration: $entity-transition-speed;
+      transition-property: height;
+
+      @include entity-rise-up(.2s, .3s);
+    }
+
+  }
+
+  li:hover {
+
+    a i {
+      text-shadow: $entity-hover-shadow;
+    }
+
+    a::after {
+      height: $entity-hover-rise;
+    }
+
+  }
+
+  li:active {
+
+    a i {
+      text-shadow: $entity-active-shadow;
+    }
+
+    a::after {
+      height: $entity-active-rise;
+    }
+
+  }
+}
+
+@keyframes entity-fade-in {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes entity-shadow-rise {
+  0% { text-shadow: $entity-active-shadow; }
+  100% { text-shadow: $entity-link-shadow; }
+}
+
+@keyframes entity-rise-up {
+  0%   { height: $entity-active-rise; }
+  100% { height: $entity-link-rise; }
+}
+
 @media screen {
-
-  @keyframes entity-fade-in {
-    0%   { opacity: 0; }
-    100% { opacity: 1; }
-  }
-
-  @keyframes entity-shadow-rise {
-    0% { text-shadow: $entity-active-shadow; }
-    100% { text-shadow: $entity-link-shadow; }
-  }
-
-  @keyframes entity-rise-up {
-    0%   { height: $entity-active-rise; }
-    100% { height: $entity-link-rise; }
-  }
 
   /*
    * Styles for the banner image.
@@ -59,14 +144,14 @@ $entity-feature-border: 1px solid $text-color;
     background-repeat: no-repeat;
     background-size: cover;
 
-    @include entity-fade-in(.2s, .8s);
+    @include entity-fade-in(.2s, .6s);
   }
 
   /*
    * Styles for the header block.
    */
 
-  body.entity > header {
+  body.entity .header {
     border: 0;
     margin: 0;
     padding: 0 7vw;
@@ -91,7 +176,7 @@ $entity-feature-border: 1px solid $text-color;
    * Styles for the left/top side of the header block.
    */
 
-  body.entity > header > div {
+  body.entity .header .landing {
     border: 0;
     margin: 0;
     padding: 0;
@@ -126,127 +211,15 @@ $entity-feature-border: 1px solid $text-color;
           font-size: 3em;
         }
 
-        @include entity-fade-in(0s, .7s);
-      }
-
-      ul {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        min-height: 4em;
-
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-
-        li {
-          display: flex;
-          flex-direction: column;
-          justify-content: flex-end;
-          flex-grow: 1;
-
-          a {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-
-            i {
-              font-size: 2em;
-              text-shadow: $entity-link-shadow;
-              transition-duration: $entity-transition-speed;
-              transition-property: text-shadow;
-
-              @media (max-width: $medium-max-size) {
-                font-size: 1.5em;
-              }
-
-            }
-
-          }
-
-          a::after {
-            content: ' ';
-            display: block;
-            height: $entity-link-rise;
-
-            transition-duration: $entity-transition-speed;
-            transition-property: height;
-          }
-
-        }
-
-        li:nth-child(1) {
-          a {
-            @include entity-fade-in(.2s, .3s);
-            i { @include entity-shadow-rise(.3s, .3s) }
-          }
-          a::after { @include entity-rise-up(.3s, .3s) }
-        }
-
-        li:nth-child(2) {
-          a {
-            @include entity-fade-in(.3s, .3s);
-            i { @include entity-shadow-rise(.4s, .3s) }
-          }
-          a::after { @include entity-rise-up(.4s, .3s) }
-        }
-
-        li:nth-child(3) {
-          a {
-            @include entity-fade-in(.4s, .3s);
-            i { @include entity-shadow-rise(.5s, .3s) }
-          }
-          a::after { @include entity-rise-up(.5s, .3s) }
-        }
-
-        li:nth-child(4) {
-          a {
-            @include entity-fade-in(.5s, .3s);
-            i { @include entity-shadow-rise(.6s, .3s) }
-          }
-          a::after { @include entity-rise-up(.6s, .3s) }
-        }
-
-        li:nth-child(5) {
-          a {
-            @include entity-fade-in(.6s, .3s);
-            i { @include entity-shadow-rise(.7s, .3s) }
-          }
-          a::after { @include entity-rise-up(.7s, .3s) }
-        }
-
-        li:hover {
-
-          a i {
-            text-shadow: $entity-hover-shadow;
-          }
-
-          a::after {
-            height: $entity-hover-rise;
-          }
-
-        }
-
-        li:active {
-
-          a i {
-            text-shadow: $entity-active-shadow;
-          }
-
-          a::after {
-            height: $entity-active-rise;
-          }
-
-        }
-
+        @include entity-fade-in(0s, .6s);
       }
 
     }
+
   }
 
   /* Styles for the right/bottom side of the header block. */
-  body.entity > header > nav {
+  body.entity .header .toc {
     border: 0;
     margin: 0;
     padding: 0;
@@ -317,15 +290,7 @@ $entity-feature-border: 1px solid $text-color;
           }
 
           p {
-            font: $lead-font;
-            font-size: 1.25em;
-            text-shadow: $entity-link-shadow;
-            transition-duration: $entity-transition-speed;
-            transition-property: text-shadow;
-
-            @media (max-width: $medium-max-size) {
-              font-size: 1em;
-            }
+            @include entity-lead();
           }
 
         }
@@ -383,9 +348,9 @@ $entity-feature-border: 1px solid $text-color;
         }
 
         a {
-          h2, p { @include entity-shadow-rise(.2s, .6s) }
+          h2, p { @include entity-shadow-rise(.2s, .3s) }
         }
-        a::after { @include entity-rise-up(.2s, .6s) }
+        a::after { @include entity-rise-up(.2s, .3s) }
       }
 
       li:nth-child(2) {
@@ -394,9 +359,9 @@ $entity-feature-border: 1px solid $text-color;
         @include entity-fade-in(.2s, .6s);
 
         a {
-          h2, p { @include entity-shadow-rise(.3s, .6s) }
+          h2, p { @include entity-shadow-rise(.3s, .3s) }
         }
-        a::after { @include entity-rise-up(.3s, .6s) }
+        a::after { @include entity-rise-up(.3s, .3s) }
       }
 
       li:nth-child(3) {
@@ -413,9 +378,9 @@ $entity-feature-border: 1px solid $text-color;
         }
 
         a {
-          h2, p { @include entity-shadow-rise(.3s, .6s) }
+          h2, p { @include entity-shadow-rise(.3s, .3s) }
         }
-        a::after { @include entity-rise-up(.3s, .6s) }
+        a::after { @include entity-rise-up(.3s, .3s) }
       }
 
       li:nth-child(4) {
@@ -430,9 +395,9 @@ $entity-feature-border: 1px solid $text-color;
         }
 
         a {
-          h2, p { @include entity-shadow-rise(.4s, .6s) }
+          h2, p { @include entity-shadow-rise(.4s, .3s) }
         }
-        a::after { @include entity-rise-up(.4s, .6s) }
+        a::after { @include entity-rise-up(.4s, .3s) }
       }
 
     }

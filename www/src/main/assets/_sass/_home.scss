@@ -1,0 +1,30 @@
+
+@media screen {
+
+  /*
+   * Styles for the links under the title.
+   */
+
+  body.home .header .landing {
+
+    div {
+
+      ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        min-height: 4em;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+
+        @include entity-links();
+
+      }
+
+    }
+
+  }
+
+}

@@ -1,0 +1,9 @@
+<ul>
+  {% for link in site.links %}
+  <li>
+    <a href="{{ link.url }}" aria-label="{{ link.title }}">
+      <i class="fa {{ link.icon }}" aria-hidden="true" title="{{ link.title }}"></i>
+    </a>
+  </li>
+  {% endfor %}
+</ul>

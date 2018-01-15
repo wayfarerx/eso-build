@@ -40,8 +40,8 @@ trait StructureRenderer {
 
   private def renderStructure(structure: Structure, depth: Int = 0): Stream[IO, String] = {
     val newLine = Stream(NewLine).covary[IO]
-    val prefix = Stream(OtherPrefix * depth).covary[IO]
-    val subPrefix = Stream(OtherPrefix * (depth + 1)).covary[IO]
+    val prefix = Stream(OtherPrefix * (depth - 1)).covary[IO]
+    val subPrefix = Stream(OtherPrefix * depth).covary[IO]
     Stream.emits(structure.structure.toSeq).covary[IO] map {
       case (key, value) => Stream(key, Separator).covary[IO] ++ (value match {
         case value@Value(_) => renderValue(value)

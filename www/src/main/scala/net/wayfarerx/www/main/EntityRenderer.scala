@@ -32,14 +32,13 @@ trait EntityRenderer {
         Map[String, Data]("footer" -> Rendered(footer))
       } ++ entity.category.toSeq.flatMap { category =>
         Map[String, Data]("category" -> category)
-      }
+      } ++ entity.style.map("style" -> Value(_)).toMap
       val (frontMatter, content): (Map[String, Data], Stream[IO, Content]) = entity match {
-        case landing: Home => Map[String, Data]() ->
-          Stream(ul(landing.children.map(child => li(a(child.location, h2(child.title) ~ p(child.description)))): _*))
-        case topic: Topic => Map[String, Data]() ->
+        case home: Home => Map("toc" -> componentsToTableOfContents(home.children)) ->
+          Stream.empty
+        case topic: Topic => Map("toc" -> componentsToTableOfContents(topic.children)) ->
           componentsToContent(topic.children)
         case article: Article => (
-          article.style.map("style" -> Value(_)).toMap ++
             article.headline.map("headline" -> Value(_)).toMap ++
             article.author.map("author" -> Value(_)).toMap
           ) -> Stream(Sequence(article.content))
@@ -51,6 +50,10 @@ trait EntityRenderer {
     }
     Stream eval stream flatMap identity
   }
+
+  private def componentsToTableOfContents(components: Vector[Component]): Collection =
+    Collection(components take 4 map
+      (c => Structure("url" -> c.location, "title" -> c.title, "description" -> c.description)))
 
   private def componentsToContent(components: Vector[Component]): Stream[IO, Content] = {
     for {
@@ -78,18 +81,15 @@ trait EntityRenderer {
     s <- findAsset(entity.banner(Entity.Banner.Small))
     m <- findAsset(entity.banner(Entity.Banner.Medium))
     l <- findAsset(entity.banner(Entity.Banner.Large))
-    f <- findAsset(entity.banner(Entity.Banner.Full))
     result <- {
       for {
         ss <- s
         mm <- m
         ll <- l
-        ff <- f
       } yield Vector(
         Entity.Banner.Small -> ss,
         Entity.Banner.Medium -> mm,
-        Entity.Banner.Large -> ll,
-        Entity.Banner.Full -> ff)
+        Entity.Banner.Large -> ll)
     } map IO.pure getOrElse {
       entity match {
         case c: Component if c.parent.isDefined =>
@@ -97,9 +97,8 @@ trait EntityRenderer {
         case _ => IO.pure(Vector(
           Entity.Banner.Small -> homePage.banner(Entity.Banner.Small),
           Entity.Banner.Medium -> homePage.banner(Entity.Banner.Medium),
-          Entity.Banner.Large -> homePage.banner(Entity.Banner.Large),
-          Entity.Banner.Full -> homePage.banner(Entity.Banner.Full)))
-      }
+          Entity.Banner.Large -> homePage.banner(Entity.Banner.Large)))
+    }
     }
   } yield result
 

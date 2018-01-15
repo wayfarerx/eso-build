@@ -28,6 +28,9 @@ sealed trait Entity {
   /** The layout used for this entity. */
   def layout: String
 
+  /** The style of this entity. */
+  def style: Option[String] = None
+
   /** The name of this entity that is unique within its category. */
   def name: String = displayName.replaceAll("""\s+""", "-").replaceAll("""[^0-9a-zA-Z\-]+""", "").toLowerCase
 
@@ -107,7 +110,7 @@ object Entity {
   object Banner {
 
     /** Returns all the banners from smallest to largest. */
-    def all: Vector[Banner] = Vector(Full, Large, Medium, Small)
+    def all: Vector[Banner] = Vector(Large, Medium, Small)
 
     /** The small banner. */
     case object Small extends Banner
@@ -117,9 +120,6 @@ object Entity {
 
     /** The large banner. */
     case object Large extends Banner
-
-    /** The full banner. */
-    case object Full extends Banner
 
   }
 
@@ -169,9 +169,6 @@ trait Topic extends Component with Composite {
  * Base class for individual article pages.
  */
 trait Article extends Component {
-
-  /** The style of this article. */
-  def style: Option[String] = None
 
   /** The headline that accompanies this article. */
   def headline: Option[String] = None

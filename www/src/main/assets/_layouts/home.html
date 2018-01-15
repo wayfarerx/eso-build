@@ -2,35 +2,22 @@
 <html>
 <head>
   {% include meta.html %}
-  <style>
-    @media screen {
-      body::after { background-image: url('{{ page.banner-large }}'); } }
-    @media screen and (max-width: 1536px) and (max-height: 1536px) {
-      body::after { background-image: url('{{ page.banner-medium }}'); } }
-    @media screen and (max-width: 768px) and (max-height: 768px) {
-      body::after { background-image: url('{{ page.banner-small }}'); } }
-  </style>
 </head>
-<body class="entity composite home">
-<header>
-  <div>
-    <div>
-      <h1>wayfarerx.net</h1>
-      <ul>
-        {% for link in site.links %}
-        <li>
-          <a href="{{ link.url }}" aria-label="{{ link.title }}">
-            <i class="fa {{ link.icon }}" aria-hidden="true" title="{{ link.title }}"></i>
-          </a>
-        </li>
-        {% endfor %}
-      </ul>
+<body class="entity composite home{% if page.style %} {{ page.style }}{% endif %}">
+<main>
+  <header class="header">
+    <div class="landing">
+      <div>
+        <h1>wayfarerx.net</h1>
+        {% include links.html %}
+      </div>
     </div>
-  </div>
-  <nav>
-    {{ content }}
-  </nav>
-</header>
+    <nav class="toc">
+      {% include toc.html %}
+    </nav>
+  </header>
+</main>
+{{ content }}
 {% include scripts.html %}
 </body>
 </html>
