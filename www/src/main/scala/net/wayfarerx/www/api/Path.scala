@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package net.wayfarerx.www
+package net.wayfarerx.www.api
 
 /**
  * Base type for all path representations.
@@ -28,6 +28,31 @@ sealed trait Path {
 
   /** Returns this path after removing all `.` and `..` elements possible. */
   def normalize: Path
+
+  /**
+   * Returns the leaf at the specified index.
+   *
+   * @param index The index of the leaf to return, must be >= 0 and < length.
+   * @return The leaf at the specified index.
+   */
+  def apply(index: Int): Path.Leaf
+
+  /**
+   * Returns true if that path is a prefix of this path.
+   *
+   * @param that The path that might be a prefix.
+   * @return True if that path is a prefix of this path.
+   */
+  def startsWith(that: Path): Boolean
+
+  /**
+   * Constructs a prefix of this path.
+   *
+   * @param offset The number of elements to skip.
+   * @param length The number of elements to return.
+   * @return The specified prefix of this path.
+   */
+  def subPath(offset: Int, length: Int): Path
 
   /**
    * Appends that path to this path.
@@ -56,7 +81,7 @@ object Path {
   val Current: String = "."
 
   /** The identifier for the parent path. */
-  val Parent: String = ".."
+  val Parent: String = "src/main"
 
   /** The separator for path elements. */
   val Separator: String = "/"
@@ -83,6 +108,12 @@ object Path {
 
     /* Normalize to this. */
     override def normalize: Path = this
+
+    /* Never do this. */
+    override def apply(index: Int): Leaf = throw new IndexOutOfBoundsException(index.toString)
+
+    /* Empty starts with empty. */
+    override def startsWith(that: Path): Boolean = that == this
 
     /* Construct a multiple. */
     override def /(that: Path): Path = that
@@ -122,6 +153,13 @@ object Path {
     /* Normalize to this. */
     override def normalize: Path = this
 
+    /* Only ever return this. */
+    override def apply(index: Int): Leaf =
+      if (index == 0) this else throw new IndexOutOfBoundsException(index.toString)
+
+    /* Only ever starts with itself. */
+    override def startsWith(that: Path): Boolean = that == this
+
     /* Construct a multiple. */
     override def /(that: Path): NonEmpty = that match {
       case Empty => this
@@ -149,6 +187,15 @@ object Path {
       case Branch(Leaf(Current), remaining) => head / remaining.normalize
       case Branch(Leaf(Parent), remaining) if !head.isParent => remaining.normalize
       case remaining => head / remaining.normalize
+    }
+
+    /* Pass down until the end. */
+    override def apply(index: Int): Leaf = if (index == 0) head else tail(index - 1)
+
+    override def startsWith(that: Path): Boolean = {
+
+
+      ???
     }
 
     /* Construct a branch. */

@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-package net.wayfarerx
+package net.wayfarerx.www
 
-import language.implicitConversions
+import scala.language.implicitConversions
 
 /**
  * Package object that defines common terms in the system.
  */
-package object www {
+package object api {
 
   /**
    * Implicitly treat all paths as relative locations.
@@ -62,6 +62,13 @@ package object www {
    * A utility for expressly defining an absolute location.
    */
   object / {
+
+    /**
+     * Returns the root of the local locations.
+     *
+     * @return The root of the local locations.
+     */
+    def apply(): Location.Absolute = Location.Absolute(Path.Empty)
 
     /**
      * Returns an absolute location for the specified path.

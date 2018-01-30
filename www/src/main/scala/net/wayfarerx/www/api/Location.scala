@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package net.wayfarerx.www
+package net.wayfarerx.www.api
 
 /**
  * Base type for concrete asset locations.
