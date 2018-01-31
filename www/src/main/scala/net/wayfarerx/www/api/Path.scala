@@ -45,14 +45,14 @@ sealed trait Path {
    */
   def startsWith(that: Path): Boolean
 
-  /**
+  /*
    * Constructs a prefix of this path.
    *
    * @param offset The number of elements to skip.
    * @param length The number of elements to return.
    * @return The specified prefix of this path.
    */
-  def subPath(offset: Int, length: Int): Path
+  //def subPath(offset: Int, length: Int): Path
 
   /**
    * Appends that path to this path.

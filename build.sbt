@@ -13,7 +13,23 @@ lazy val www = (project in file("www")).
     libraryDependencies += fs2,
     libraryDependencies += fs2io,
     libraryDependencies += scalaTest % Test,
-    name := "www-core"
+    name := "www"
   )
 
-run in Compile <<= (run in Compile in www)
+lazy val generator = (project in file("generator")).
+  settings(
+    common,
+    libraryDependencies += scalaTags,
+    libraryDependencies += catsEffect,
+    libraryDependencies += fs2,
+    libraryDependencies += fs2io,
+    libraryDependencies += jettyServer,
+    libraryDependencies += jettyServlet,
+    libraryDependencies += scalaTest % Test,
+    name := "generator"
+  ) dependsOn www
+
+run in Compile := (run in Compile in generator)
+mainClass in run := Some("net.wayfarerx.www.generator.main.GenerateWebsite")
+
+mainClass in reStart := Some("net.wayfarerx.www.generator.main.ServeWebsite")
