@@ -19,17 +19,12 @@
 package net.wayfarerx.www.generator
 package main
 
-import java.nio.file.{Path, Paths}
-
 import css.WayfarerxCss
 
 /**
  * Base type for applications that work with the website.
  */
 trait Website {
-
-  /** The path of the root project directory. */
-  def projectDirectory: Path
 
   /** The pages that make up the website, indexed by location. */
   final lazy val Pages: Map[String, Page] = {
@@ -46,6 +41,7 @@ trait Website {
   }
 
   /** The style sheet for the website. */
-  final lazy val Styles: () => String = WayfarerxCss.styleSheetText _
+  final lazy val Styles: Map[String, () => String] =
+    Map("/css/wayfarerx.css" -> WayfarerxCss.styleSheetText _)
 
 }

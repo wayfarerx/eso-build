@@ -26,12 +26,10 @@ import java.nio.file.{Files, Path, Paths, StandardCopyOption}
  */
 object GenerateWebsite extends Website with App {
 
-  /* Return the current directory. */
-  override lazy val projectDirectory: Path = Paths.get(".").toAbsolutePath
-
   {
-    Assets.initialize(projectDirectory)
-    val target = projectDirectory.resolve("target/website")
+    val root = Paths.get(".").toAbsolutePath
+    Assets.initialize(root)
+    val target = root.resolve("target/website")
     // Deploy the assets.
     val assets = Assets.list map { source =>
       val destination = target.resolve(source.subpath(Assets.root.getNameCount, source.getNameCount))
@@ -47,14 +45,14 @@ object GenerateWebsite extends Website with App {
       destination
     }.toVector
     // Deploy the CSS.
-    val css = Vector {
-      val destination = target.resolve("css/wayfarerx.css")
+    val styles = Styles.map { case (location, style) =>
+      val destination = target.resolve(location.substring(1))
       Files.createDirectories(destination.getParent)
-      Files.write(destination, Styles().getBytes("UTF-8"))
+      Files.write(destination, style().getBytes("UTF-8"))
       destination
     }
     // TODO Make a big diff or something.
-    assets ++ pages ++ css foreach println
+    assets ++ pages ++ styles foreach println
   }
 
 }

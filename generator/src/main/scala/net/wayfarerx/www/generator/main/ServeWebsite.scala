@@ -32,11 +32,8 @@ import org.eclipse.jetty.servlet.ServletHandler
  */
 object ServeWebsite extends Website with App {
 
-  /* Return the parent directory. */
-  override lazy val projectDirectory: Path = Paths.get("..").toAbsolutePath
-
   {
-    Assets.initialize(projectDirectory)
+    Assets.initialize(Paths.get("..").toAbsolutePath)
     val port = 4000
     val server = new Server(port)
     val handler = new ServletHandler
@@ -54,7 +51,7 @@ object ServeWebsite extends Website with App {
    * @return The mime type and contents of the main CSS file if the required path is supplied.
    */
   def readCss(location: String): Option[(String, Stream[IO, Byte])] =
-    if (location != "/css/wayfarerx.css") None else Some("text/css" -> Stream.emit(Styles()).through(text.utf8Encode))
+    Styles get location map (css => "text/css" -> Stream.emit(css()).through(text.utf8Encode))
 
   /**
    * Attempts to serve a page.
