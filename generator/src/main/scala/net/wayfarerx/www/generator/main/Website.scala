@@ -28,8 +28,8 @@ import css.WayfarerxCss
  */
 trait Website {
 
-  /** The path to the assets for the website. */
-  final lazy val Assets: Path = Paths.get("../www/src/main/assets/")
+  /** The path of the root project directory. */
+  def projectDirectory: Path
 
   /** The pages that make up the website, indexed by location. */
   final lazy val Pages: Map[String, Page] = {

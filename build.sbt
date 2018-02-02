@@ -9,16 +9,17 @@ lazy val common = Seq(
 lazy val www = (project in file("www")).
   settings(
     common,
+    name := "www",
     libraryDependencies += catsEffect,
     libraryDependencies += fs2,
     libraryDependencies += fs2io,
-    libraryDependencies += scalaTest % Test,
-    name := "www"
+    libraryDependencies += scalaTest % Test
   )
 
 lazy val generator = (project in file("generator")).
   settings(
     common,
+    name := "generator",
     libraryDependencies += scalaTags,
     libraryDependencies += catsEffect,
     libraryDependencies += fs2,
@@ -26,10 +27,6 @@ lazy val generator = (project in file("generator")).
     libraryDependencies += jettyServer,
     libraryDependencies += jettyServlet,
     libraryDependencies += scalaTest % Test,
-    name := "generator"
+    mainClass in (Compile, run) := Some("net.wayfarerx.www.generator.main.GenerateWebsite"),
+    mainClass in reStart := Some("net.wayfarerx.www.generator.main.ServeWebsite")
   ) dependsOn www
-
-run in Compile := (run in Compile in generator)
-mainClass in run := Some("net.wayfarerx.www.generator.main.GenerateWebsite")
-
-mainClass in reStart := Some("net.wayfarerx.www.generator.main.ServeWebsite")

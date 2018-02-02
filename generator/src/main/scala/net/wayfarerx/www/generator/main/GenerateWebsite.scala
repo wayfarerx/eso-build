@@ -19,39 +19,42 @@
 package net.wayfarerx.www.generator
 package main
 
-import collection.JavaConverters._
-import java.nio.file.{Files, Path, Paths}
+import java.nio.file.{Files, Path, Paths, StandardCopyOption}
 
 /**
  * Application that generates the website to a destination folder.
  */
 object GenerateWebsite extends Website with App {
 
-  // TODO
+  /* Return the current directory. */
+  override lazy val projectDirectory: Path = Paths.get(".").toAbsolutePath
 
-  def findAssets2(target: Path, incoming: Vector[Path], outgoing: Vector[(Path, Path)]): Vector[(Path, Path)] =
-    if (incoming.isEmpty) outgoing else incoming.head match {
-      case directory if Files.isDirectory(directory) =>
-        target.resolve()
-        ???
-      case file if Files.isRegularFile(file) =>
-        ???
-      case _ =>
-        ???
+  {
+    Assets.initialize(projectDirectory)
+    val target = projectDirectory.resolve("target/website")
+    // Deploy the assets.
+    val assets = Assets.list map { source =>
+      val destination = target.resolve(source.subpath(Assets.root.getNameCount, source.getNameCount))
+      Files.createDirectories(destination.getParent)
+      Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING)
+      destination
+    }
+    // Deploy the pages.
+    val pages = Pages.map { case (location, page) =>
+      val destination = target.resolve(location.substring(1) + "index.html")
+      Files.createDirectories(destination.getParent)
+      Files.write(destination, page().getBytes("UTF-8"))
+      destination
+    }.toVector
+    // Deploy the CSS.
+    val css = Vector {
+      val destination = target.resolve("css/wayfarerx.css")
+      Files.createDirectories(destination.getParent)
+      Files.write(destination, Styles().getBytes("UTF-8"))
+      destination
+    }
+    // TODO Make a big diff or something.
+    assets ++ pages ++ css foreach println
   }
 
-  def findAssets(prefix: String, cursor: Path): Vector[(String, Path)] =
-    cursor match {
-      case directory if Files.isDirectory(directory) =>
-        val name = ""
-        val location = s"$prefix$name${if (name.nonEmpty) "/" else ""}"
-        Files.list(directory).toArray.map(p => findAssets(location, p.asInstanceOf[Path])).toVector.flatten
-      case file if Files.isRegularFile(file) =>
-        Vector(prefix -> cursor)
-      case _ =>
-        Vector()
-    }
-
 }
-
-
