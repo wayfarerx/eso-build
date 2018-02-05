@@ -19,7 +19,7 @@
 package net.wayfarerx.www.generator
 package main
 
-import java.nio.file.{Files, Path, Paths}
+import java.nio.file.{Path, Paths}
 import javax.servlet.http.{HttpServlet, HttpServletRequest, HttpServletResponse}
 
 import cats.effect.IO
@@ -30,17 +30,24 @@ import org.eclipse.jetty.servlet.ServletHandler
 /**
  * Application that serves the website using an embedded jetty container.
  */
-object ServeWebsite extends Website with App {
+object ServeWebsite extends BaseWebsite with App {
+
+  /** The port to serve the website on. */
+  val Port = 4000
+
+  /* Use the production site location. */
+  override lazy val Server: String = s"http://localhost:$Port"
+
+  /* Use the parent directory. */
+  override lazy val projectDirectory: Path = Paths.get("..").toAbsolutePath
 
   {
-    Assets.initialize(Paths.get("..").toAbsolutePath)
-    val port = 4000
-    val server = new Server(port)
+    val server = new Server(Port)
     val handler = new ServletHandler
     server.setHandler(handler)
     handler.addServletWithMapping(classOf[WebsiteServlet], "/*")
     server.start()
-    println(s"Server running on port $port.")
+    println(s"Server running on port $Port.")
     server.join()
   }
 
@@ -50,8 +57,8 @@ object ServeWebsite extends Website with App {
    * @param location The path that must match the main CSS file path.
    * @return The mime type and contents of the main CSS file if the required path is supplied.
    */
-  def readCss(location: String): Option[(String, Stream[IO, Byte])] =
-    Styles get location map (css => "text/css" -> Stream.emit(css()).through(text.utf8Encode))
+  def readStylesheet(location: String): Option[(String, Stream[IO, Byte])] =
+    Stylesheets get location map (sheet => "text/css" -> Stream.emit(sheet.contents()).through(text.utf8Encode))
 
   /**
    * Attempts to serve a page.
@@ -60,7 +67,7 @@ object ServeWebsite extends Website with App {
    * @return The mime type and contents of the requested page it it exists.
    */
   def readPage(location: String): Option[(String, Stream[IO, Byte])] =
-    Pages get location map (page => "text/html" -> Stream.emit(page()).through(text.utf8Encode))
+    Pages get location map (page => "text/html" -> Stream.emit(page.contents()).through(text.utf8Encode))
 
   /**
    * Attempts to serve a file directly from the assets directory.
@@ -69,14 +76,14 @@ object ServeWebsite extends Website with App {
    * @return The mime type and contents of the requested file if it exists.
    */
   def readAsset(location: String): Option[(String, Stream[IO, Byte])] =
-    Assets get location map (asset => Files.probeContentType(asset) -> io.file.readAll[IO](asset, 2048))
+    Assets get location map (asset => asset.mimeType -> Stream.emits(asset.contents()))
 
   /**
    * The servlet that bridges between Jetty and our internal implementation.
    */
   final class WebsiteServlet extends HttpServlet {
     override protected def doGet(request: HttpServletRequest, response: HttpServletResponse): Unit = {
-      readCss(request.getPathInfo) orElse
+      readStylesheet(request.getPathInfo) orElse
         readPage(request.getPathInfo) orElse
         readAsset(request.getPathInfo) match {
         case Some((mime, stream)) =>

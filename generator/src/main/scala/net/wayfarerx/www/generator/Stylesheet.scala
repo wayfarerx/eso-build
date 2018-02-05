@@ -20,41 +20,9 @@ package net.wayfarerx.www.generator
 
 /**
  * Data that can be written to a CSS file.
+ *
+ * @param location The location of the stylesheet.
+ * @param contents The function that produces the contents of the stylesheet.
  */
-trait Stylesheet {
+case class Stylesheet(location: String)(val contents: () => String)
 
-  /** The location of the stylesheet in the website. */
-  def location: String
-
-  /** Returns the text of the stylesheet. */
-  def apply(): String
-
-  /* Return the text of the stylesheet. */
-  final override def toString: String = apply()
-
-}
-
-/**
- * Factory for stylesheets.
- */
-object Stylesheet {
-
-  /**
-   * Creates a stylesheet.
-   *
-   * @param location The location of the stylesheet.
-   * @param f The function that produces the contents of the stylesheet.
-   * @return A new stylesheet.
-   */
-  def apply(location: String)(f: => String): Stylesheet = {
-    val _location = location
-    new Stylesheet {
-
-      override def location: String = _location
-
-      override def apply(): String = f
-
-    }
-  }
-
-}

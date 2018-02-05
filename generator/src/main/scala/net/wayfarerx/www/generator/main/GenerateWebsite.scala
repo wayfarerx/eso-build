@@ -19,40 +19,45 @@
 package net.wayfarerx.www.generator
 package main
 
-import java.nio.file.{Files, Path, Paths, StandardCopyOption}
+import java.nio.file.{Files, Path, Paths}
 
 /**
  * Application that generates the website to a destination folder.
  */
-object GenerateWebsite extends Website with App {
+object GenerateWebsite extends BaseWebsite with App {
+
+  /* Use the production site location. */
+  override lazy val Server: String = "https://wayfarerx.net"
+
+  /* Use the current directory. */
+  override lazy val projectDirectory: Path = Paths.get(".").toAbsolutePath
 
   {
     val root = Paths.get(".").toAbsolutePath
-    Assets.initialize(root)
     val target = root.resolve("target/website")
     // Deploy the assets.
-    val assets = Assets.list map { source =>
-      val destination = target.resolve(source.subpath(Assets.root.getNameCount, source.getNameCount))
+    val allAssets = Assets.values map { asset =>
+      val destination = target.resolve(asset.location.substring(1))
       Files.createDirectories(destination.getParent)
-      Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING)
+      Files.write(destination, asset.contents())
       destination
     }
     // Deploy the pages.
-    val pages = Pages.map { case (location, page) =>
+    val allPages = Pages.map { case (location, page) =>
       val destination = target.resolve(location.substring(1) + "index.html")
       Files.createDirectories(destination.getParent)
-      Files.write(destination, page().getBytes("UTF-8"))
+      Files.write(destination, page.contents().getBytes("UTF-8"))
       destination
     }.toVector
     // Deploy the CSS.
-    val styles = Styles.map { case (location, style) =>
-      val destination = target.resolve(location.substring(1))
+    val allStyles = Stylesheets.values.map { stylesheet =>
+      val destination = target.resolve(stylesheet.location.substring(1))
       Files.createDirectories(destination.getParent)
-      Files.write(destination, style().getBytes("UTF-8"))
+      Files.write(destination, stylesheet.contents().getBytes("UTF-8"))
       destination
     }
     // TODO Make a big diff or something.
-    assets ++ pages ++ styles foreach println
+    allAssets ++ allPages ++ allStyles foreach println
   }
 
 }
