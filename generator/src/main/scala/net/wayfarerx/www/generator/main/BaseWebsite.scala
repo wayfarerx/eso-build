@@ -30,7 +30,8 @@ import java.util.Properties
 trait BaseWebsite
   extends Website
     with templates.AllTemplates
-    with pages.AllPages {
+    with pages.AllPages
+    with stylesheets.AllStylesheets {
 
   /** The root directory of the project. */
   def projectDirectory: Path
@@ -85,7 +86,15 @@ trait BaseWebsite
   /* Return the stylesheets in the website indexed by location. */
   final override lazy val Stylesheets: Map[String, Stylesheet] =
     Vector(
-      "/css/wayfarerx.css" -> stylesheets.WayfarerxCss.toString _
+      "/css/wayfarerx.css" -> { () =>
+        s"""@import url('https://fonts.googleapis.com/css?family=IM+Fell+Great+Primer|Raleway');
+           |
+           |@media screen {
+           |  $CommonStyles
+           |
+           |  $WayfarerxStyles
+           |}""".stripMargin
+      }
     ).map { case (location, content) => location -> Stylesheet(location)(content) }.toMap
 
 

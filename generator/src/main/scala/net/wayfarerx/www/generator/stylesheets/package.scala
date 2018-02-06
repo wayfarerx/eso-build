@@ -21,10 +21,10 @@ package object stylesheets {
   val wxLeadFont: String = "normal normal bold 1em 'Raleway', sans-serif"
   val wxCopyFont: String = "normal normal normal 1em 'Raleway', sans-serif"
 
-  val wxSmallMaxSize: String = " 768px"
-  val wxMediumMinSize: String = " 769px"
-  val wxMediumMaxSize: String = " 1536px"
-  val wxLargeMinSize: String = " 1537px"
+  val wxSmallMaxSize: Int = 768
+  val wxMediumMinSize: Int = wxSmallMaxSize + 1
+  val wxMediumMaxSize: Int = 1536
+  val wxLargeMinSize: Int = wxMediumMaxSize + 1
 
   trait AllStylesheets
     extends CommonCss
