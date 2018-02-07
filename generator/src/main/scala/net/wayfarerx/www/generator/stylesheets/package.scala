@@ -1,5 +1,8 @@
 package net.wayfarerx.www.generator
 
+import scalatags.Text.all._
+import scalatags.stylesheet._
+
 package object stylesheets {
 
   val wxBackgroundColor: String = "#262216"
@@ -25,6 +28,8 @@ package object stylesheets {
   val wxMediumMinSize: Int = wxSmallMaxSize + 1
   val wxMediumMaxSize: Int = 1536
   val wxLargeMinSize: Int = wxMediumMaxSize + 1
+
+  val flexDisplay: StyleSheetFrag = display := "flex"
 
   trait AllStylesheets
     extends CommonCss

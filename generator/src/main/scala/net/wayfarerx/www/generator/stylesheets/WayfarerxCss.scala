@@ -11,8 +11,9 @@ trait WayfarerxCss {
 
     override def customSheetName: Option[String] = Some("wx")
 
-    val x = cls(
-      backgroundColor := wxBackgroundColor
+    val columns = cls(
+      flexDisplay,
+      flexDirection := "column"
     )
 
     override def toString: String = WayfarerxStyles.styleSheetText
