@@ -18,8 +18,6 @@ package object stylesheets {
   val wxShadowColor: String = "#000000"
   val wxFeatureColor: String = "#0a260a"
 
-  val wxBackgroundColorFade: String = ".3"
-
   val HeadlineFont: String = "normal normal normal 1em 'IM Fell Great Primer', serif"
   val wxLeadFont: String = "normal normal bold 1em 'Raleway', sans-serif"
   val wxCopyFont: String = "normal normal normal 1em 'Raleway', sans-serif"
@@ -29,10 +27,21 @@ package object stylesheets {
   val wxMediumMaxSize: Int = 1536
   val wxLargeMinSize: Int = wxMediumMaxSize + 1
 
-  val flexDisplay: StyleSheetFrag = display := "flex"
-
   trait AllStylesheets
-    extends CommonCss
-    with WayfarerxCss
+    extends BasicCss
+      with CommonCss
+      with BannersCss {
+
+    def masterStylesheet: String =
+      s"""@media screen {
+         |${indent(BasicStyles.toString)}
+         |${indent(CommonStyles.toString)}
+         |${indent(BannerStyles.toString)}
+        |}""".stripMargin
+
+    private def indent(lines: String): String =
+      io.Source.fromString(lines).getLines()  filter (_.nonEmpty) map ("  " + _) mkString "\r\n"
+
+  }
 
 }

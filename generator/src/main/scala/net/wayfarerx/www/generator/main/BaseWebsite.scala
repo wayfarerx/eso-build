@@ -84,18 +84,15 @@ trait BaseWebsite
     Pages.map(e => e._2 -> e._1)
 
   /* Return the stylesheets in the website indexed by location. */
-  final override lazy val Stylesheets: Map[String, Stylesheet] =
+  final override lazy val Stylesheets: Map[String, Stylesheet] = {
+
     Vector(
       "/css/wayfarerx.css" -> { () =>
         s"""@import url('https://fonts.googleapis.com/css?family=IM+Fell+Great+Primer|Raleway');
            |
-           |@media screen {
-           |  $CommonStyles
-           |
-           |  $WayfarerxStyles
-           |}""".stripMargin
+           |$masterStylesheet""".stripMargin
       }
     ).map { case (location, content) => location -> Stylesheet(location)(content) }.toMap
-
+  }
 
 }

@@ -3,10 +3,12 @@ package templates
 
 import scalatags.Text.short._
 
+import stylesheets._
+
 trait MetadataTemplates {
   self: Website =>
 
-  private val ignore = Set("the", "and")
+  private val ignore = Set("the", "and", "with")
 
   final def pageMetadata(page: Page, metadata: Metadata): Frag = frag(
     commonMetadata(metadata.title) ++
@@ -56,9 +58,9 @@ trait MetadataTemplates {
     scalatags.Text.tags2.style(
       s"""@media screen {
         |  body::after { background-image: url('${backgrounds.large.location}'); } }
-        |@media screen and (max-width: 1536px) and (max-height: 1536px) {
+        |@media screen and (max-width: ${wxMediumMaxSize}px) and (max-height: ${wxMediumMaxSize}px) {
         |  body::after { background-image: url('${backgrounds.medium.location}'); } }
-        |@media screen and (max-width: 768px) and (max-height: 768px) {
+        |@media screen and (max-width: ${wxSmallMaxSize}px) and (max-height: ${wxSmallMaxSize}px) {
         |  body::after { background-image: url('${backgrounds.small.location}'); } }
       """.stripMargin.trim)
   )

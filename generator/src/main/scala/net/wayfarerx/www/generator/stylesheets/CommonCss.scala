@@ -1,45 +1,43 @@
-package net.wayfarerx.www.generator
-package stylesheets
+package net.wayfarerx.www.generator.stylesheets
 
+import scalatags.Text.all._
+import scalatags.stylesheet._
+
+// FIXME
 trait CommonCss {
 
-  object CommonStyles {
+  private val flexColumn: Vector[StyleSheetFrag] = Vector(
+    display.flex,
+    flexDirection.column
+  )
 
-    override def toString: String =
-      s"""
-         |  *, *:before, *:after {
-         |    box-sizing: inherit;
-         |  }
-         |
-         |  html {
-         |    box-sizing: border-box;
-         |  }
-         |
-         |  html, body {
-         |    border: 0;
-         |    margin: 0;
-         |    padding: 0;
-         |    max-width: 100%;
-         |    overflow-x: hidden;
-         |  }
-         |
-        |  body {
-         |    background-color: $wxBackgroundColor;
-         |    color: $wxTextColor;
-         |    font: $wxCopyFont;
-         |    font-size: 100%;
-         |
-        |    display: flex;
-         |    flex-direction: column;
-         |    justify-content: space-between;
-         |  }
-         |
-        |  a { text-decoration: none; }
-         |  a:link { color: $wxLinkColor; }
-         |  a:visited { color: $wxVisitedColor; }
-         |  a:hover { color: $wxHoverColor; }
-         |  a:active { color: $wxActiveColor; }
-         |""".stripMargin
+  private val flexRow: Vector[StyleSheetFrag] = Vector(
+    display.flex,
+    flexDirection.row
+  )
+
+  object CommonStyles extends StyleSheet {
+    initStyleSheet()
+
+    override def customSheetName: Option[String] = Some("wx")
+
+    val column = cls(flexColumn: _*)
+
+    val row = cls(flexRow: _*)
+
+    override def toString: String = {
+      def fix(text: String): String =
+        text.indexOf('{') match {
+          case bracket if bracket > 0 && !Character.isWhitespace(text.charAt(bracket - 1)) =>
+            s"${text.substring(0, bracket)} {${fix(text.substring(bracket + 1, text.length))}"
+          case bracket if bracket == 0 =>
+            "{" + fix(text.substring(1))
+          case _ =>
+            text
+        }
+
+      fix(styleSheetText)
+    }
 
   }
 

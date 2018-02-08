@@ -3,7 +3,9 @@ package templates
 
 import scalatags.Text.short._
 
-trait PageTemplates { self: MetadataTemplates =>
+import stylesheets.CommonCss
+
+trait PageTemplates { self: MetadataTemplates with CommonCss =>
 
   final def homePage(page: Page, metadata: Metadata, content: Frag): Frag =
     outerPage(page, metadata, content)
@@ -11,7 +13,7 @@ trait PageTemplates { self: MetadataTemplates =>
   final def outerPage(page: Page, metadata: Metadata, content: Frag): Frag =
     html(
       head(pageMetadata(page, metadata)),
-      body(content)
+      body(CommonStyles.column, content)
     )
 
 }
