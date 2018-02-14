@@ -1,5 +1,5 @@
 /*
- * package.scala
+ * Ingredient.scala
  *
  * Copyright 2018 wayfarerx <x@wayfarerx.net> (@thewayfarerx)
  *
@@ -16,20 +16,35 @@
  * limitations under the License.
  */
 
-package net.wayfarerx.www.api
+package net.wayfarerx.www
+package drinks
 
-/**
- * Package object that defines common terms in HTML.
- */
-package object html {
+sealed trait Ingredient {
 
-  def img(src: Location, alt: String): Image = Image(src, alt)
+  type IngredientType >: this.type <: Ingredient
 
+  def name: Name
 
-  def foo(): Unit = {
+}
 
-    val i = img(src = / { "images" / "foo.jpg" }, alt = "")
-    i
+object Ingredient {
+
+  trait Item extends Ingredient {
+
+    final override type IngredientType = Item
 
   }
+
+  trait Liquid extends Ingredient {
+
+    final override type IngredientType = Liquid
+
+  }
+
+  trait Solid extends Ingredient {
+
+    final override type IngredientType = Solid
+
+  }
+
 }

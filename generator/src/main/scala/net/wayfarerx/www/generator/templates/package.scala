@@ -4,9 +4,11 @@ package object templates {
 
   trait AllTemplates
     extends MetadataTemplates
-      with PageTemplates
-      with stylesheets.AllStylesheets {
-    self: Website =>
+      with BannerTemplates
+      with PageTemplates {
+    self: stylesheets.ClassedStyles
+      with stylesheets.InlineStyles
+      with Website =>
   }
 
 }

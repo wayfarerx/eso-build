@@ -1,5 +1,5 @@
 /*
- * Path.scala
+ * Home.scala
  *
  * Copyright 2018 wayfarerx <x@wayfarerx.net> (@thewayfarerx)
  *

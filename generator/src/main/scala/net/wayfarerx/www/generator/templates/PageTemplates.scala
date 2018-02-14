@@ -1,19 +1,19 @@
 package net.wayfarerx.www.generator
 package templates
 
+import scalacss.ScalatagsCss._
 import scalatags.Text.short._
 
-import stylesheets.CommonCss
+trait PageTemplates {
+  self: stylesheets.ClassedStyles with MetadataTemplates with BannerTemplates with Website =>
 
-trait PageTemplates { self: MetadataTemplates with CommonCss =>
+  final def homePage(page: Page, metadata: Metadata, content: Frag*): Frag =
+    outerPage(page, metadata, banner("wayfarerx.net", page.image, navigation = false, footer = true), content)
 
-  final def homePage(page: Page, metadata: Metadata, content: Frag): Frag =
-    outerPage(page, metadata, content)
-
-  final def outerPage(page: Page, metadata: Metadata, content: Frag): Frag =
+  final def outerPage(page: Page, metadata: Metadata, content: Frag*): Frag =
     html(
       head(pageMetadata(page, metadata)),
-      body(CommonStyles.column, content)
+      body(css.rows)(content: _*)
     )
 
 }

@@ -1,47 +1,63 @@
 package net.wayfarerx.www.generator
 
-import scalatags.Text.all._
-import scalatags.stylesheet._
+import scalacss.DevDefaults._
 
 package object stylesheets {
 
-  val wxBackgroundColor: String = "#262216"
-  val wxContainerColor: String = "#49412c"
-  val wxHighlightColor: String = "#97743a"
+  trait Styles {
 
-  val wxLinkColor: String = "#b0a18e"
-  val wxHoverColor: String = "#beb2a2"
-  val wxActiveColor: String = "#ccc3b7"
-  val wxVisitedColor: String = "#a09382"
+    def wxBackgroundColor: String = "#262216"
 
-  val wxTextColor: String = "#928677"
-  val wxShadowColor: String = "#000000"
-  val wxFeatureColor: String = "#0a260a"
+    def wxContainerColor: String = "#49412c"
 
-  val HeadlineFont: String = "normal normal normal 1em 'IM Fell Great Primer', serif"
-  val wxLeadFont: String = "normal normal bold 1em 'Raleway', sans-serif"
-  val wxCopyFont: String = "normal normal normal 1em 'Raleway', sans-serif"
+    def wxHighlightColor: String = "#97743a"
 
-  val wxSmallMaxSize: Int = 768
-  val wxMediumMinSize: Int = wxSmallMaxSize + 1
-  val wxMediumMaxSize: Int = 1536
-  val wxLargeMinSize: Int = wxMediumMaxSize + 1
+    def wxLinkColor: String = "#b0a18e"
 
-  trait AllStylesheets
-    extends BasicCss
-      with CommonCss
-      with BannersCss {
+    def wxHoverColor: String = "#beb2a2"
 
-    def masterStylesheet: String =
-      s"""@media screen {
-         |${indent(BasicStyles.toString)}
-         |${indent(CommonStyles.toString)}
-         |${indent(BannerStyles.toString)}
-        |}""".stripMargin
+    def wxActiveColor: String = "#ccc3b7"
 
-    private def indent(lines: String): String =
-      io.Source.fromString(lines).getLines()  filter (_.nonEmpty) map ("  " + _) mkString "\r\n"
+    def wxVisitedColor: String = "#a09382"
+
+    def wxTextColor: String = "#928677"
+
+    def wxShadowColor: String = "#000000"
+
+    def wxFeatureColor: String = "#0a260a"
+
+    def wxHeadlineFont: String = "normal normal normal 1em 'IM Fell Great Primer', serif"
+
+    def wxLeadFont: String = "normal normal bold 1em 'Raleway', sans-serif"
+
+    def wxCopyFont: String = "normal normal normal 1em 'Raleway', sans-serif"
+
+    def wxSmallMaxSize: Int = 768
+
+    def wxMediumMinSize: Int = wxSmallMaxSize + 1
+
+    def wxMediumMaxSize: Int = 1536
+
+    def wxLargeMinSize: Int = wxMediumMaxSize + 1
+
+    def wxBodyPaddingSmall: Int = 3
+
+    def wxBodyPaddingMedium: Int = 5
+
+    def wxBodyPaddingLarge: Int = 7
 
   }
+
+  trait AllStyles extends BasicStyles with ClassedStyles with InlineStyles { self: Website =>
+
+    def masterStylesheet: String =
+      s"""@import url('https://fonts.googleapis.com/css?family=IM+Fell+Great+Primer|Raleway');
+         |
+         |${BasicCss.render}
+         |${ClassedCss.render[String]}
+         |""".stripMargin
+
+  }
+
 
 }

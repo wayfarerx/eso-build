@@ -1,5 +1,5 @@
 /*
- * Article.scala
+ * Cocktail.scala
  *
  * Copyright 2018 wayfarerx <x@wayfarerx.net> (@thewayfarerx)
  *
@@ -16,21 +16,20 @@
  * limitations under the License.
  */
 
-package net.wayfarerx.www.api
-package pages
+package net.wayfarerx.www
+package drinks
 
-import language.implicitConversions
+case class Cocktail(
+  name: Name
+)
 
-case class Article[T: Article.Support](page: T) extends Page[T] {
+object Cocktail {
 
-}
+  sealed trait Kind
 
-object Article {
+  object Kind {
 
-  implicit def articleSupportToArticle[T: Article.Support](article: T): Article[T] =
-    Article(article)
-
-  trait Support[T] extends Page.Support[T] {
+    case object BeforeDinner extends Kind
 
   }
 

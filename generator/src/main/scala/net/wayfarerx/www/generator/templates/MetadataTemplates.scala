@@ -1,12 +1,11 @@
 package net.wayfarerx.www.generator
 package templates
 
+import scalacss.DevDefaults._
 import scalatags.Text.short._
 
-import stylesheets._
-
 trait MetadataTemplates {
-  self: Website =>
+  self: Website with stylesheets.InlineStyles =>
 
   private val ignore = Set("the", "and", "with")
 
@@ -55,14 +54,7 @@ trait MetadataTemplates {
 
   private def stylesheetMetadata(backgrounds: Backgrounds): Seq[Frag] = Seq(
     link(*.rel := "stylesheet", *.href := "/css/wayfarerx.css"),
-    scalatags.Text.tags2.style(
-      s"""@media screen {
-        |  body::after { background-image: url('${backgrounds.large.location}'); } }
-        |@media screen and (max-width: ${wxMediumMaxSize}px) and (max-height: ${wxMediumMaxSize}px) {
-        |  body::after { background-image: url('${backgrounds.medium.location}'); } }
-        |@media screen and (max-width: ${wxSmallMaxSize}px) and (max-height: ${wxSmallMaxSize}px) {
-        |  body::after { background-image: url('${backgrounds.small.location}'); } }
-      """.stripMargin.trim)
+    scalatags.Text.tags2.style(new InlineCss(backgrounds).render.trim)
   )
 
 }
