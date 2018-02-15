@@ -16,40 +16,18 @@
  * limitations under the License.
  */
 
-package net.wayfarerx.www
-package drinks
+package net.wayfarerx.www.drinks
 
 /**
  * Defines the amount of an ingredient that is used.
  *
- * @tparam UnitType The type of unit this quantity is measured in.
- * @param value The amount this quantity represents.
- * @param unit  The unit this quantity is measured in.
+ * @param amount The amount this quantity represents.
+ * @param unit   The unit this quantity is measured in.
  */
-case class Quantity[+UnitType <: Quantity.Unit](value: Double, unit: UnitType) {
-
-  def unary_+ : Quantity[UnitType] = this
-
-  def unary_- : Quantity[UnitType] = Quantity(-value, unit)
-
-  def + (that: Double): Quantity[UnitType] = this :+ that
-
-  def - (that: Double): Quantity[UnitType] = this :- that
-
-  def * (that: Double): Quantity[UnitType] = this :* that
-
-  def / (that: Double): Quantity[UnitType] = this :/ that
-
-  def :+ (that: Double): Quantity[UnitType] = Quantity(value + that, unit)
-
-  def :- (that: Double): Quantity[UnitType] = Quantity(value - that, unit)
-
-  def :* (that: Double): Quantity[UnitType] = Quantity(value * that, unit)
-
-  def :/ (that: Double): Quantity[UnitType] = Quantity(value / that, unit)
+case class Quantity(amount: Double, unit: Quantity.Unit) {
 
   /* Return the volume and unit suffix. */
-  override def toString: String = s"$value $unit"
+  override def toString: String = s"$amount $unit"
 
 }
 
@@ -58,76 +36,22 @@ case class Quantity[+UnitType <: Quantity.Unit](value: Double, unit: UnitType) {
  */
 object Quantity {
 
-  //
-  // Aliases and factories for common quantities.
-  //
-
-  /** A quantity measured by volume. */
-  type Volume = Quantity[ByVolume]
-
   /**
-   * Factory for quantities by volume.
+   * Attempts to decode a quantity from its string form.
+   *
+   * @param encoded The encoded quantity string.
+   * @return The decoded quantity if it can be decoded.
    */
-  object Volume {
-
-    /**
-     * Creates a new quantity measured by volume.
-     *
-     * @param value The amount this quantity represents.
-     * @param unit  The volume this quantity is measured in.
-     * @return A new quantity measured by volume.
-     */
-    def apply(value: Double, unit: ByVolume): Volume = Quantity(value, unit)
-
-  }
-
-  /** A quantity measured by weight. */
-  type Weight = Quantity[ByWeight]
-
-  /**
-   * Factory for quantities by weight.
-   */
-  object Weight {
-
-    /**
-     * Creates a new quantity measured by weight.
-     *
-     * @param value The amount this quantity represents.
-     * @param unit  The weight this quantity is measured in.
-     * @return A new quantity measured by weight.
-     */
-    def apply(value: Double, unit: ByWeight): Weight = Quantity(value, unit)
-
-  }
-
-  //
-  // Implicit interfaces available on quantities.
-  //
-
-  implicit class VolumeExtensions(val volume: Volume) extends AnyVal {
-
-    def toMl: Volume = toMilliliters
-
-    def toCl: Volume = toCentiliters
-
-    def toDl: Volume = toDeciliters
-
-    def toML: Volume = toMilliliters
-
-    def toCL: Volume = toCentiliters
-
-    def toDL: Volume = toDeciliters
-
-    def toL: Volume = toLiters
-
-    def toMilliliters: Volume = Volume(volume.unit.convertTo(volume.value, Milliliters), Milliliters)
-
-    def toCentiliters: Volume = Volume(volume.unit.convertTo(volume.value, Centiliters), Centiliters)
-
-    def toDeciliters: Volume = Volume(volume.unit.convertTo(volume.value, Deciliters), Deciliters)
-
-    def toLiters: Volume = Volume(volume.unit.convertTo(volume.value, Liters), Liters)
-
+  def apply(encoded: String): Option[Quantity] = {
+    val normalized = encoded.trim.replaceAll("""\s+""", " ")
+    normalized indexWhere Character.isWhitespace match {
+      case index if index > 0 => try {
+        Unit(normalized.substring(index + 1)) map (Quantity(normalized.substring(0, index).toDouble, _))
+      } catch {
+        case _: NumberFormatException => None
+      }
+      case _ => None
+    }
   }
 
   //
@@ -135,177 +59,165 @@ object Quantity {
   //
 
   /** The unit of volume equal to 1/1000th of a liter. */
-  lazy val Milliliters: ByVolume = new ByVolume {
-
-    /* Always defer to other measures of volume. */
-    override def convertFrom(value: Double, unit: ByVolume): Double = unit match {
-      case Milliliters => value
-      case other => other.convertTo(value, Milliliters)
-    }
-
-    /* Always defer to other measures of volume. */
-    override def convertTo(value: Double, unit: ByVolume): Double = unit match {
-      case Milliliters => value
-      case other => other.convertFrom(value, Milliliters)
-    }
-
-    /* Return the milliliter suffix. */
-    override def toString: String = "ml"
-
-  }
+  val Milliliters: Unit = Unit("mL", "milliliter", "milliliters")
 
   /** The unit of volume equal to 1/100th of a liter. */
-  lazy val Centiliters: ByVolume = ByVolume(10, "cl")
+  val Centiliters: Unit = Unit("cL", "centiliter", "centiliters")
 
   /** The unit of volume equal to 1/10th of a liter. */
-  lazy val Deciliters: ByVolume = ByVolume(100, "dl")
+  val Deciliters: Unit = Unit("dL", "deciliter", "deciliters")
 
   /** The unit of volume equal to one liter. */
-  lazy val Liters: ByVolume = ByVolume(1000, "l")
+  val Liters: Unit = Unit("L", "liter", "liters")
+
+  /** The unit of volume equal to one US teaspoon. */
+  val Teaspoon: Unit = Unit("tsp", "teaspoon", "teaspoons")
+
+  /** The unit of volume equal to one US tablespoon. */
+  val Tablespoon: Unit = Unit("Tbsp", "tablespoon", "tablespoons")
+
+  /** The unit of volume equal to one US fluid ounce. */
+  val FluidOunces: Unit = Unit("fl oz", "fluid ounce", "fluid ounces")
+
+  /** The unit of volume equal to one US cup. */
+  val Cup: Unit = Unit("cp", "cup", "cups")
+
+  /** The unit of volume equal to one US pint. */
+  val Pint: Unit = Unit("pt", "pint", "pints")
+
+  /** The unit of volume equal to one US quart. */
+  val Quart: Unit = Unit("qt", "quart", "quarts")
+
+  /** The unit of volume equal to one US gallon. */
+  val Gallon: Unit = Unit("gal", "gallon", "gallon")
 
   //
   // The supported units of weight.
   //
 
   /** The unit of weight equal to 1/1000th of a gram. */
-  lazy val Milligrams: ByWeight = new ByWeight {
-
-    /* Always defer to other measures of weight. */
-    override def convertFrom(value: Double, unit: ByWeight): Double = unit match {
-      case Milligrams => value
-      case other => other.convertTo(value, Milligrams)
-    }
-
-    /* Always defer to other measures of weight. */
-    override def convertTo(value: Double, unit: ByWeight): Double = unit match {
-      case Milligrams => value
-      case other => other.convertFrom(value, Milligrams)
-    }
-
-    /* Return the milligram suffix. */
-    override def toString: String = "mg"
-
-  }
+  val Milligrams: Unit = Unit("mg", "milligram", "milligrams")
 
   /** The unit of weight equal to 1/100th of a gram. */
-  lazy val Centigrams: ByWeight = ByWeight(10, "cg")
+  val Centigrams: Unit = Unit("cg", "centigram", "centigrams")
 
   /** The unit of weight equal to 1/10th of a gram. */
-  lazy val Decigrams: ByWeight = ByWeight(100, "dg")
+  val Decigrams: Unit = Unit("dg", "decigram", "decigrams")
 
   /** The unit of weight equal to one gram. */
-  lazy val Grams: ByWeight = ByWeight(1000, "g")
+  val Grams: Unit = Unit("g", "gram", "grams")
 
+  /** The unit of weight equal to one US ounce. */
+  val Ounces: Unit = Unit("oz", "ounce", "ounces")
+
+  /** The unit of weight equal to one US pound. */
+  val Pounds: Unit = Unit("lb", "pound", "pounds")
 
   //
-  // Definitions of and factories for the unit hierarchy.
+  // The supported counting unit.
+  //
+
+  /** The unit measure equal to one item. */
+  val Pieces: Unit = Unit("pcs", "piece", "pieces")
+
+  //
+  // The unit type declaration & factory.
   //
 
   /**
-   * Base type for all units of measure.
+   * Represents the unit that a quantity is measured in.
+   *
+   * @param abbreviation The abbreviation of this unit.
+   * @param singular     The singular name of this unit.
+   * @param plural       The multiple name of this unit.
    */
-  sealed trait Unit {
-
-    /** The class of units that this unit can be converted to and from. */
-    type CompatibleUnit <: Unit
+  final class Unit private(val abbreviation: String, val singular: String, val plural: String) {
 
     /**
-     * Returns the specified value in the supplied unit converted to a value in this unit.
+     * Returns the name of this unit to use for the specified amount.
      *
-     * @param value The value in the supplied unit to convert.
-     * @param unit  The unit to convert the value from.
-     * @return The specified value in the supplied unit converted to a value in this unit.
+     * @param amount The amount of this unit to name.
+     * @return The name of this unit to use for the specified amount.
      */
-    def convertFrom(value: Double, unit: CompatibleUnit): Double
-
-    /**
-     * Returns the specified value in this unit converted to a value in the specified unit.
-     *
-     * @param value The value in this unit to convert.
-     * @param unit  The unit to convert the value to.
-     * @return The specified value in this unit converted to a value in the specified unit.
-     */
-    def convertTo(value: Double, unit: CompatibleUnit): Double
-
-  }
-
-  /**
-   * Base type for units of measure by volume.
-   */
-  sealed trait ByVolume extends Unit {
-
-    /* Compatible with any volume. */
-    final override type CompatibleUnit = ByVolume
-
-  }
-
-  /**
-   * Factory for units of measure by volume.
-   */
-  object ByVolume {
-
-    /**
-     * Creates a new measure of volume from the equivalent number of milliliters and a suffix.
-     *
-     * @param inMilliliters The number of milliliters in the unit.
-     * @param suffix        The suffix of the unit.
-     * @return A new measure of volume from the equivalent number of milliliters and a suffix.
-     */
-    def apply(inMilliliters: Double, suffix: String): ByVolume = new ByVolume {
-
-      /* Convert through milliliters. */
-      override def convertFrom(value: Double, unit: ByVolume): Double = unit match {
-        case Milliliters => value / inMilliliters
-        case other => convertFrom(other.convertTo(value, Milliliters), Milliliters)
-      }
-
-      /* Convert milliliters or defer to the other unit. */
-      override def convertTo(value: Double, unit: ByVolume): Double = unit match {
-        case Milliliters => value * inMilliliters
-        case other => other.convertFrom(value, this)
-      }
-
+    def name(amount: Double): String = amount match {
+      case 1.0 => singular
+      case _ => plural
     }
 
+    /* Use value equality with the abbreviation, singular name and plural name. */
+    override def equals(that: Any): Boolean = that match {
+      case Unit(a, s, p) if a == abbreviation && s == singular && p == plural => true
+      case _ => false
+    }
+
+    /* Use value equality with the abbreviation, singular name and plural name. */
+    override def hashCode(): Int =
+      Unit.hashCode ^ abbreviation.hashCode ^ singular.hashCode ^ plural.hashCode
+
+    /* Return the abbreviation. */
+    override def toString: String = abbreviation
+
   }
 
   /**
-   * Base type for units of measure by weight.
+   * Factory for units of measure.
    */
-  sealed trait ByWeight extends Unit {
+  object Unit {
 
-    /* Compatible with any weight. */
-    final override type CompatibleUnit = ByWeight
-
-  }
-
-  /**
-   * Factory for units of measure by weight.
-   */
-  object ByWeight {
+    /** The units of measure indexed by abbreviation and name. */
+    private val index: Map[String, Unit] = Seq(
+      Milliliters,
+      Centiliters,
+      Deciliters,
+      Liters,
+      Teaspoon,
+      Tablespoon,
+      FluidOunces,
+      Cup,
+      Pint,
+      Quart,
+      Gallon,
+      Milligrams,
+      Centigrams,
+      Decigrams,
+      Grams,
+      Ounces,
+      Pounds,
+      Pieces
+    ).flatMap { unit =>
+      Seq(unit.abbreviation -> unit, unit.singular -> unit, unit.plural -> unit)
+    }.map { case (key, value) =>
+      key.trim.replaceAll("""\s+""", " ").toLowerCase -> value
+    }.toMap
 
     /**
-     * Creates a new measure of weight from the equivalent number of milligrams and a suffix.
+     * Looks up the specified unit by abbreviation or name.
      *
-     * @param inMilligrams The number of milligrams in the unit.
-     * @param suffix       The suffix of the unit.
-     * @return A new measure of weight from the equivalent number of milligrams and a suffix.
+     * @param key The abbreviation, singular name or plural name of the unit to look up.
+     * @return The requested unit of measure if it is found.
      */
-    def apply(inMilligrams: Double, suffix: String): ByWeight = new ByWeight {
+    def apply(key: String): Option[Unit] =
+      index get key.trim.replaceAll("""\s+""", " ").toLowerCase
 
-      /* Convert through milliliters. */
-      override def convertFrom(value: Double, unit: ByWeight): Double = unit match {
-        case Milligrams => value / inMilligrams
-        case other => convertFrom(other.convertTo(value, Milligrams), Milligrams)
-      }
+    /**
+     * Creates a new unit of measure.
+     *
+     * @param abbreviation The abbreviation of the unit.
+     * @param singular     The singular name of the unit.
+     * @param plural       The plural name of the unit.
+     * @return A new unit of measure.
+     */
+    private[Quantity] def apply(abbreviation: String, singular: String, plural: String): Unit =
+      new Unit(abbreviation, singular, plural)
 
-      /* Convert milliliters or defer to the other unit. */
-      override def convertTo(value: Double, unit: ByWeight): Double = unit match {
-        case Milligrams => value * inMilligrams
-        case other => other.convertFrom(value, this)
-      }
-
-    }
+    /**
+     * Extracts a unit of measure.
+     *
+     * @param unit The unit of measure to extract.
+     * @return The abbreviation, singular name and plural name of the unit.
+     */
+    def unapply(unit: Unit): Option[(String, String, String)] =
+      Some(unit.abbreviation, unit.singular, unit.plural)
 
   }
 

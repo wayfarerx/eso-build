@@ -21,30 +21,10 @@ package drinks
 
 sealed trait Ingredient {
 
-  type IngredientType >: this.type <: Ingredient
-
   def name: Name
 
 }
 
 object Ingredient {
-
-  trait Item extends Ingredient {
-
-    final override type IngredientType = Item
-
-  }
-
-  trait Liquid extends Ingredient {
-
-    final override type IngredientType = Liquid
-
-  }
-
-  trait Solid extends Ingredient {
-
-    final override type IngredientType = Solid
-
-  }
 
 }
