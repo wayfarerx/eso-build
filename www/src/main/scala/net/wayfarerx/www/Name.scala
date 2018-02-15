@@ -30,12 +30,16 @@ case class Name(singular: String, plural: String, abbreviation: Option[String] =
   import Name._
 
   /** The ID form of the name. */
-  final lazy val id: String = normalized
+  final lazy val id: String = singular.trim.toLowerCase
     .replaceAll("""[\'\"\(\)\[\]\{\}\<\>]+""", "")
     .replaceAll("""[^a-zA-Z0-9]+""", "-")
 
-  /** The normalized form of the name. */
-  final lazy val normalized: String = singular.trim.replaceAll("""\s+""", " ").toLowerCase
+  /**
+   * Returns the form used for most of the counts.
+   *
+   * @return The form used for most of the counts.
+   */
+  def apply(): String = apply(0)
 
   /**
    * Returns the form used for the specified count.
@@ -43,7 +47,7 @@ case class Name(singular: String, plural: String, abbreviation: Option[String] =
    * @param count The number of items being considered.
    * @return The form used for the specified count.
    */
-  def apply(count: Double): String = count match {
+  def apply(count: Double): String = abbreviation getOrElse count match {
     case 1.0 | -1.0 => singular
     case _ => plural
   }
@@ -53,6 +57,13 @@ case class Name(singular: String, plural: String, abbreviation: Option[String] =
 
   /** The capitalized plural form of the name. */
   def pluralCapitalized: String = capitalize(plural)
+
+  /**
+   * Returns the form used for most of the capitalized counts.
+   *
+   * @return The form used for most of the capitalized counts.
+   */
+  def capitalized(): String = capitalized(0)
 
   /**
    * Returns the capitalized form used for the specified count.
@@ -72,6 +83,13 @@ case class Name(singular: String, plural: String, abbreviation: Option[String] =
   def pluralFormalized: String = formalize(plural)
 
   /**
+   * Returns the form used for most of the capitalized counts.
+   *
+   * @return The form used for most of the capitalized counts.
+   */
+  def formalized(): String = formalized(0)
+
+  /**
    * Returns the formalized form used for the specified count.
    *
    * @param count The number of items being considered.
@@ -81,6 +99,9 @@ case class Name(singular: String, plural: String, abbreviation: Option[String] =
     case 1.0 | -1.0 => singularFormalized
     case _ => pluralFormalized
   }
+
+  /* Return the default form. */
+  override def toString: String = apply()
 
 }
 
@@ -170,13 +191,13 @@ object Name {
       var result = Vector[String]()
       var lastStart, lastEnd = 0
       FormalizePattern.findAllMatchIn(input) foreach { word =>
-        if (word.start > lastEnd) result += input.substring(lastEnd, word.start)
+        if (word.start > lastEnd) result :+= input.substring(lastEnd, word.start)
         val text = input.substring(word.start, word.end)
-        result += (if (FormalizeIgnore(text)) text else capitalize(text))
+        result :+= (if (FormalizeIgnore(text)) text else capitalize(text))
         lastStart = word.start
         lastEnd = word.end
       }
-      ((if (result.size > 1) result.init :+ capitalize(result.last) else result) ++ input.substring(lastEnd)).mkString
+      ((if (result.size > 1) result.init :+ capitalize(result.last) else result) :+ input.substring(lastEnd)).mkString
     }
 
 }

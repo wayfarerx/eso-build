@@ -16,18 +16,19 @@
  * limitations under the License.
  */
 
-package net.wayfarerx.www.drinks
+package net.wayfarerx.www
+package drinks
 
 /**
  * Defines the amount of an ingredient that is used.
  *
  * @param amount The amount this quantity represents.
- * @param unit   The unit this quantity is measured in.
+ * @param unit   The name of the unit this quantity is measured in.
  */
-case class Quantity(amount: Double, unit: Quantity.Unit) {
+case class Quantity(amount: Double, unit: Name) {
 
   /* Return the volume and unit suffix. */
-  override def toString: String = s"$amount $unit"
+  override def toString: String = s"$amount ${unit(amount)}"
 
 }
 
@@ -35,6 +36,10 @@ case class Quantity(amount: Double, unit: Quantity.Unit) {
  * Definitions of the various units of measure.
  */
 object Quantity {
+
+  //
+  // Quantity factories.
+  //
 
   /**
    * Attempts to decode a quantity from its string form.
@@ -127,11 +132,9 @@ object Quantity {
   /**
    * Represents the unit that a quantity is measured in.
    *
-   * @param abbreviation The abbreviation of this unit.
-   * @param singular     The singular name of this unit.
-   * @param plural       The multiple name of this unit.
+   * @param name The name of this unit.
    */
-  final class Unit private(val abbreviation: String, val singular: String, val plural: String) {
+  final class Unit private(name: Name) {
 
     /**
      * Returns the name of this unit to use for the specified amount.
