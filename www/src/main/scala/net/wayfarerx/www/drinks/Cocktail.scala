@@ -20,17 +20,11 @@ package net.wayfarerx.www
 package drinks
 
 case class Cocktail(
-  name: Name
+  name: Name,
+  components: Vector[(Ingredient, Quantity)]
 )
 
 object Cocktail {
 
-  sealed trait Kind
-
-  object Kind {
-
-    case object BeforeDinner extends Kind
-
-  }
 
 }

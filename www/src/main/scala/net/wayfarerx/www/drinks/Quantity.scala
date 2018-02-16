@@ -20,21 +20,21 @@ package net.wayfarerx.www
 package drinks
 
 /**
- * Defines the amount of an ingredient that is used.
- *
- * @param amount The amount this quantity represents.
- * @param unit   The name of the unit this quantity is measured in.
- */
-case class Quantity(amount: Double, unit: Name) {
+  * Defines the amount of an ingredient that is used.
+  *
+  * @param amount The amount this quantity represents.
+  * @param unit   The unit this quantity is measured in.
+  */
+case class Quantity(amount: Double, unit: Quantity.Unit) {
 
   /* Return the volume and unit suffix. */
-  override def toString: String = s"$amount ${unit(amount)}"
+  override def toString: String = s"$amount $unit"
 
 }
 
 /**
- * Definitions of the various units of measure.
- */
+  * Definitions of the various units of measure.
+  */
 object Quantity {
 
   //
@@ -42,16 +42,16 @@ object Quantity {
   //
 
   /**
-   * Attempts to decode a quantity from its string form.
-   *
-   * @param encoded The encoded quantity string.
-   * @return The decoded quantity if it can be decoded.
-   */
+    * Attempts to decode a quantity from its string form.
+    *
+    * @param encoded The encoded quantity string.
+    * @return The decoded quantity if it can be decoded.
+    */
   def apply(encoded: String): Option[Quantity] = {
-    val normalized = encoded.trim.replaceAll("""\s+""", " ")
-    normalized indexWhere Character.isWhitespace match {
+    val trimmed = encoded.trim
+    trimmed indexWhere Character.isWhitespace match {
       case index if index > 0 => try {
-        Unit(normalized.substring(index + 1)) map (Quantity(normalized.substring(0, index).toDouble, _))
+        Unit(trimmed.substring(index + 1)) map (Quantity(trimmed.substring(0, index).toDouble, _))
       } catch {
         case _: NumberFormatException => None
       }
@@ -64,98 +64,88 @@ object Quantity {
   //
 
   /** The unit of volume equal to 1/1000th of a liter. */
-  val Milliliters: Unit = Unit("mL", "milliliter", "milliliters")
+  val Milliliters: Unit = Unit("mL", Name("milliliter", "milliliters"))
 
   /** The unit of volume equal to 1/100th of a liter. */
-  val Centiliters: Unit = Unit("cL", "centiliter", "centiliters")
+  val Centiliters: Unit = Unit("cL", Name("centiliter", "centiliters"))
 
   /** The unit of volume equal to 1/10th of a liter. */
-  val Deciliters: Unit = Unit("dL", "deciliter", "deciliters")
+  val Deciliters: Unit = Unit("dL", Name("deciliter", "deciliters"))
 
   /** The unit of volume equal to one liter. */
-  val Liters: Unit = Unit("L", "liter", "liters")
+  val Liters: Unit = Unit("L", Name("liter", "liters"))
 
   /** The unit of volume equal to one US teaspoon. */
-  val Teaspoon: Unit = Unit("tsp", "teaspoon", "teaspoons")
+  val Teaspoon: Unit = Unit("tsp", Name("teaspoon", "teaspoons"))
 
   /** The unit of volume equal to one US tablespoon. */
-  val Tablespoon: Unit = Unit("Tbsp", "tablespoon", "tablespoons")
+  val Tablespoon: Unit = Unit("Tbsp", Name("tablespoon", "tablespoons"))
 
   /** The unit of volume equal to one US fluid ounce. */
-  val FluidOunces: Unit = Unit("fl oz", "fluid ounce", "fluid ounces")
+  val FluidOunces: Unit = Unit("fl oz", Name("fluid ounce", "fluid ounces"))
 
   /** The unit of volume equal to one US cup. */
-  val Cup: Unit = Unit("cp", "cup", "cups")
+  val Cup: Unit = Unit("cp", Name("cup", "cups"))
 
   /** The unit of volume equal to one US pint. */
-  val Pint: Unit = Unit("pt", "pint", "pints")
+  val Pint: Unit = Unit("pt", Name("pint", "pints"))
 
   /** The unit of volume equal to one US quart. */
-  val Quart: Unit = Unit("qt", "quart", "quarts")
+  val Quart: Unit = Unit("qt", Name("quart", "quarts"))
 
   /** The unit of volume equal to one US gallon. */
-  val Gallon: Unit = Unit("gal", "gallon", "gallon")
+  val Gallon: Unit = Unit("gal", Name("gallon", "gallon"))
 
   //
   // The supported units of weight.
   //
 
   /** The unit of weight equal to 1/1000th of a gram. */
-  val Milligrams: Unit = Unit("mg", "milligram", "milligrams")
+  val Milligrams: Unit = Unit("mg", Name("milligram", "milligrams"))
 
   /** The unit of weight equal to 1/100th of a gram. */
-  val Centigrams: Unit = Unit("cg", "centigram", "centigrams")
+  val Centigrams: Unit = Unit("cg", Name("centigram", "centigrams"))
 
   /** The unit of weight equal to 1/10th of a gram. */
-  val Decigrams: Unit = Unit("dg", "decigram", "decigrams")
+  val Decigrams: Unit = Unit("dg", Name("decigram", "decigrams"))
 
   /** The unit of weight equal to one gram. */
-  val Grams: Unit = Unit("g", "gram", "grams")
+  val Grams: Unit = Unit("g", Name("gram", "grams"))
 
   /** The unit of weight equal to one US ounce. */
-  val Ounces: Unit = Unit("oz", "ounce", "ounces")
+  val Ounces: Unit = Unit("oz", Name("ounce", "ounces"))
 
   /** The unit of weight equal to one US pound. */
-  val Pounds: Unit = Unit("lb", "pound", "pounds")
+  val Pounds: Unit = Unit("lb", Name("pound", "pounds"))
 
   //
   // The supported counting unit.
   //
 
   /** The unit measure equal to one item. */
-  val Pieces: Unit = Unit("pcs", "piece", "pieces")
+  val Pieces: Unit = Unit("pcs", Name("piece", "pieces"))
 
   //
   // The unit type declaration & factory.
   //
 
   /**
-   * Represents the unit that a quantity is measured in.
-   *
-   * @param name The name of this unit.
-   */
-  final class Unit private(name: Name) {
-
-    /**
-     * Returns the name of this unit to use for the specified amount.
-     *
-     * @param amount The amount of this unit to name.
-     * @return The name of this unit to use for the specified amount.
-     */
-    def name(amount: Double): String = amount match {
-      case 1.0 => singular
-      case _ => plural
-    }
+    * Represents the unit that a quantity is measured in.
+    *
+    * @param abbreviation The abbreviation of this unit.
+    * @param name         The name of this unit.
+    */
+  final class Unit private(val abbreviation: String, val name: Name) {
 
     /* Use value equality with the abbreviation, singular name and plural name. */
     override def equals(that: Any): Boolean = that match {
-      case Unit(a, s, p) if a == abbreviation && s == singular && p == plural => true
+      case Unit(a, n) if a == abbreviation && n == name => true
       case _ => false
     }
 
     /* Use value equality with the abbreviation, singular name and plural name. */
     override def hashCode(): Int =
-      Unit.hashCode ^ abbreviation.hashCode ^ singular.hashCode ^ plural.hashCode
+      Unit.hashCode ^ abbreviation.hashCode ^ name.hashCode
 
     /* Return the abbreviation. */
     override def toString: String = abbreviation
@@ -163,8 +153,8 @@ object Quantity {
   }
 
   /**
-   * Factory for units of measure.
-   */
+    * Factory for units of measure.
+    */
   object Unit {
 
     /** The units of measure indexed by abbreviation and name. */
@@ -188,39 +178,38 @@ object Quantity {
       Pounds,
       Pieces
     ).flatMap { unit =>
-      Seq(unit.abbreviation -> unit, unit.singular -> unit, unit.plural -> unit)
+      Seq(unit.abbreviation -> unit, unit.name.singular -> unit, unit.name.plural -> unit)
     }.map { case (key, value) =>
-      key.trim.replaceAll("""\s+""", " ").toLowerCase -> value
+      key.toLowerCase -> value
     }.toMap
 
     /**
-     * Looks up the specified unit by abbreviation or name.
-     *
-     * @param key The abbreviation, singular name or plural name of the unit to look up.
-     * @return The requested unit of measure if it is found.
-     */
+      * Looks up the specified unit by abbreviation or name.
+      *
+      * @param key The abbreviation, singular name or plural name of the unit to look up.
+      * @return The requested unit of measure if it is found.
+      */
     def apply(key: String): Option[Unit] =
       index get key.trim.replaceAll("""\s+""", " ").toLowerCase
 
     /**
-     * Creates a new unit of measure.
-     *
-     * @param abbreviation The abbreviation of the unit.
-     * @param singular     The singular name of the unit.
-     * @param plural       The plural name of the unit.
-     * @return A new unit of measure.
-     */
-    private[Quantity] def apply(abbreviation: String, singular: String, plural: String): Unit =
-      new Unit(abbreviation, singular, plural)
+      * Creates a new unit of measure.
+      *
+      * @param abbreviation The abbreviation of the unit.
+      * @param name         The name of the unit.
+      * @return A new unit of measure.
+      */
+    private[Quantity] def apply(abbreviation: String, name: Name): Unit =
+      new Unit(abbreviation, name)
 
     /**
-     * Extracts a unit of measure.
-     *
-     * @param unit The unit of measure to extract.
-     * @return The abbreviation, singular name and plural name of the unit.
-     */
-    def unapply(unit: Unit): Option[(String, String, String)] =
-      Some(unit.abbreviation, unit.singular, unit.plural)
+      * Extracts a unit of measure.
+      *
+      * @param unit The unit of measure to extract.
+      * @return The abbreviation, singular name and plural name of the unit.
+      */
+    def unapply(unit: Unit): Option[(String, Name)] =
+      Some(unit.abbreviation, unit.name)
 
   }
 

@@ -1,5 +1,5 @@
 /*
- * Ingredient.scala
+ * Id.scala
  *
  * Copyright 2018 wayfarerx <x@wayfarerx.net> (@thewayfarerx)
  *
@@ -17,18 +17,28 @@
  */
 
 package net.wayfarerx.www
-package drinks
 
 /**
-  * Base type for all ingredients.
-  */
-sealed trait Ingredient {
+ * The unique ID used for all top-level content.
+ */
+final class Id private(val value: String) extends AnyVal
 
-  /** The name of this ingredient. */
-  def name: Name
+/**
+ * Factory for content IDs.
+ */
+object Id {
 
-}
-
-object Ingredient {
+  /**
+   * Creates a new ID by normalizing the specified string.
+   *
+   * @param value The value to normalize and use as an ID.
+   * @return The normalized ID.
+   */
+  def apply(value: String): Id = new Id(
+    value
+      .replaceAll("""[\`\'\"\(\)\[\]\{\}\<\>]+""", "")
+      .trim.toLowerCase
+      .replaceAll("""[^a-z0-9]+""", "-")
+  )
 
 }
