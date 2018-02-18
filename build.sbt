@@ -10,6 +10,9 @@ lazy val www = (project in file("www")).
   settings(
     common,
     name := "www",
+    libraryDependencies += circeCore,
+    libraryDependencies += circeGeneric,
+    libraryDependencies += circeYaml,
     libraryDependencies += flexmark,
     libraryDependencies += scalaTest % Test
   )

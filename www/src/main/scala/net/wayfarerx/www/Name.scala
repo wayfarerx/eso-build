@@ -19,11 +19,11 @@
 package net.wayfarerx.www
 
 /**
-  * The name of an object in the system.
-  *
-  * @param singular The singular form of the name.
-  * @param plural   The plural form of the name.
-  */
+ * The name of an object in the system.
+ *
+ * @param singular The singular form of the name.
+ * @param plural   The plural form of the name.
+ */
 case class Name(singular: String, plural: String) {
 
   import Name._
@@ -38,12 +38,12 @@ case class Name(singular: String, plural: String) {
   def ids: Vector[Id] = id +: alias.toVector
 
   /**
-    * Returns the form used for the specified count.
-    *
-    * @param count The number of items being considered, defaults to zero.
-    * @return The form used for the specified count.
-    */
-  def apply(count: Double = 0.0): String = count match {
+   * Returns the form used for the specified count.
+   *
+   * @param count The number of items being considered, defaults to one.
+   * @return The form used for the specified count.
+   */
+  def apply(count: Double = 1.0): String = count match {
     case 1.0 | -1.0 => singular
     case _ => plural
   }
@@ -55,12 +55,12 @@ case class Name(singular: String, plural: String) {
   def pluralCapitalized: String = capitalize(plural)
 
   /**
-    * Returns the capitalized form used for the specified count.
-    *
-    * @param count The number of items being considered, defaults to zero.
-    * @return The capitalized form used for the specified count.
-    */
-  def capitalized(count: Double = 0.0): String = count match {
+   * Returns the capitalized form used for the specified count.
+   *
+   * @param count The number of items being considered, defaults to one.
+   * @return The capitalized form used for the specified count.
+   */
+  def capitalized(count: Double = 1.0): String = count match {
     case 1.0 | -1.0 => singularCapitalized
     case _ => pluralCapitalized
   }
@@ -72,12 +72,12 @@ case class Name(singular: String, plural: String) {
   def pluralFormalized: String = formalize(plural)
 
   /**
-    * Returns the formalized form used for the specified count.
-    *
-    * @param count The number of items being considered, defaults to zero.
-    * @return The formalized form used for the specified count.
-    */
-  def formalized(count: Double = 0.0): String = count match {
+   * Returns the formalized form used for the specified count.
+   *
+   * @param count The number of items being considered, defaults to one.
+   * @return The formalized form used for the specified count.
+   */
+  def formalized(count: Double = 1.0): String = count match {
     case 1.0 | -1.0 => singularFormalized
     case _ => pluralFormalized
   }
@@ -88,13 +88,27 @@ case class Name(singular: String, plural: String) {
 }
 
 /**
-  * Factory for names.
-  */
+ * Factory for names.
+ */
 object Name {
+
+  /** Support for converting metadata into names. */
+  implicit val MetadataSupport: Metadata.FromMetadata[Name] = {
+    case structure@Metadata.Structure(_) =>
+      structure.get[String]("singular") map { singular =>
+        structure.get[String]("plural") map (plural => Name(singular, plural)) getOrElse Name(singular)
+      }
+    case Metadata.Value(singular) => Some(Name(singular))
+    case _ => None
+  }
+
+  /** The pattern of word to match when formalizing. */
+  private val CapitalizePattern =
+    """[\p{IsLetter}\p{IsDigit}]""".r
 
   /** The pattern of word to match when formalizing. */
   private val FormalizePattern =
-    """[a-ZA-Z_][a-zA-Z0-9\'\-_]+""".r
+    """[\p{IsLetter}\p{IsDigit}][\p{IsLetter}\p{IsDigit}\p{IsPunctuation}\-_]*""".r
 
   /** The words to ignore when formalizing. */
   private val FormalizeIgnore = Set(
@@ -141,60 +155,44 @@ object Name {
   )
 
   /**
-    * Creates a name with the same singular and plural forms.
-    *
-    * @param name         The name to use.
-    * @return A name with the same singular and plural forms.
-    */
+   * Creates a name with the same singular and plural forms.
+   *
+   * @param name The name to use.
+   * @return A name with the same singular and plural forms.
+   */
   def apply(name: String): Name =
     Name(name, name)
 
   /**
-    * Capitalizes a string as if it was at the start of a sentence.
-    *
-    * @param str The string to capitalize.
-    * @return The string capitalized as if it was at the start of a sentence.
-    */
+   * Capitalizes a string as if it was at the start of a sentence.
+   *
+   * @param str The string to capitalize.
+   * @return The string capitalized as if it was at the start of a sentence.
+   */
   private def capitalize(str: String): String =
-    if (str.isEmpty) str else str(0).toUpper + str.substring(1, str.length)
+    CapitalizePattern.findFirstMatchIn(str) map { letter =>
+      (if (letter.start > 0) str.substring(0, letter.start) else "") +
+        str.substring(letter.start, letter.end).toUpperCase +
+        (if (letter.end < str.length) str.substring(letter.end, str.length) else "")
+    } getOrElse str
 
   /**
-    * Formalizes a string as if it was the title of a document.
-    *
-    * @param str The string to formalize.
-    * @return The string formalized as if it was the title of a document.
-    */
+   * Formalizes a string as if it was the title of a document.
+   *
+   * @param str The string to formalize.
+   * @return The string formalized as if it was the title of a document.
+   */
   private def formalize(str: String): String =
     if (str.isEmpty) str else {
-      val input = capitalize(str)
       var result = Vector[String]()
-      var lastStart, lastEnd = 0
-      FormalizePattern.findAllMatchIn(input) foreach { word =>
-        if (word.start > lastEnd) result :+= input.substring(lastEnd, word.start)
-        val text = input.substring(word.start, word.end)
-        result :+= (if (FormalizeIgnore(text)) text else capitalize(text))
-        lastStart = word.start
-        lastEnd = word.end
+      var cursor = 0
+      FormalizePattern.findAllMatchIn(str) foreach { word =>
+        if (word.start > cursor) result :+= str.substring(cursor, word.start)
+        val text = str.substring(word.start, word.end)
+        result :+= (if (cursor > 0 && FormalizeIgnore(text.toLowerCase)) text else capitalize(text))
+        cursor = word.end
       }
-      ((if (result.size > 1) result.init :+ capitalize(result.last) else result) :+ input.substring(lastEnd)).mkString
+      ((if (result.size > 1) result.init :+ capitalize(result.last) else result) :+ str.substring(cursor)).mkString
     }
-
-  trait HasName[T] {
-
-    def nameOf(named: T): Name
-
-  }
-
-  object HasName {
-
-    def apply[T](f: T => Name): HasName[T] = f(_)
-
-    implicit final class Named[T: HasName](named: T) {
-
-      def name: Name = implicitly[HasName[T]].nameOf(named)
-
-    }
-
-  }
 
 }

@@ -21,7 +21,12 @@ package net.wayfarerx.www
 /**
  * The unique ID used for all top-level content.
  */
-final class Id private(val value: String) extends AnyVal
+final class Id private(val value: String) extends AnyVal {
+
+  /* Use the value as the string form. */
+  override def toString: String = value
+
+}
 
 /**
  * Factory for content IDs.
@@ -35,10 +40,13 @@ object Id {
    * @return The normalized ID.
    */
   def apply(value: String): Id = new Id(
-    value
+    java.text.Normalizer.normalize(value, java.text.Normalizer.Form.NFD)
+      .replaceAll("""[^\p{ASCII}]+""", "")
       .replaceAll("""[\`\'\"\(\)\[\]\{\}\<\>]+""", "")
-      .trim.toLowerCase
-      .replaceAll("""[^a-z0-9]+""", "-")
+      .replaceAll("""[^a-zA-Z0-9]+""", "-")
+      .replaceAll("""^[\-]+""", "")
+      .replaceAll("""[\-]+$""", "")
+      .toLowerCase
   )
 
 }

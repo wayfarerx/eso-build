@@ -18,91 +18,234 @@
 
 package net.wayfarerx.www
 
-import scala.ref.SoftReference
+import ref.SoftReference
+import io.circe.yaml
+import net.wayfarerx.www
 
 /**
- * A finite collection of indexed objects.
+ * A finite collection of indexed objects loaded from markdown files in the class path.
  */
-final class Index[Indexed: Name.HasName] private(
-  path: String,
-  parse: String => Indexed,
-  classLoader: ClassLoader = classOf[Index[_]].getClassLoader
-) {
+sealed trait Index[Indexed <: AnyRef] {
 
-  import Name.HasName.Named
-
-  /** The keys defined in this index. */
-  private lazy val keys: Set[String] = {
-    val source = io.Source.fromResource(path, classLoader)(io.Codec.UTF8)
-    try source.getLines.filter(_ endsWith ".md").toSet
-    finally source.close()
-  }
-
-  /** The keys indexed by the IDs that refer to them. */
-  private lazy val keysById: Map[Id, String] = iterator.flatMap {
-    case (key, indexed) => (indexed.name.id, key) +: indexed.name.alias.map(_ -> key).toVector
-  }.toMap
-
-  /** The cache of indexed objects by ID. */
-  private val indexedById = collection.mutable.Map[Id, SoftReference[Indexed]]()
-
-  /** The cache of indexed objects by resource key. */
-  private val indexedByKey = collection.mutable.Map[String, SoftReference[Indexed]]()
+  /** The IDs managed by this index. */
+  def ids: Iterator[Id]
 
   /**
-   * Attempts to materialize the indexed object found under the specified ID.
+   * Attempts to return the indexed object found under the specified ID.
    *
    * @param id The ID of the indexed object to search for.
    * @return The specified indexed object if it was found.
    */
-  def find(id: Id): Option[Indexed] =
-    synchronized {
-      indexedById get id collect {
-        case SoftReference(indexed) => indexed
-      }
-    } orElse {
-      keysById get id map (key => synchronized(load(key)))
+  def find(id: Id): Option[Indexed]
+
+  /**
+   * Returns an iterator over the entire collection of indexed objects.
+   *
+   * @return An iterator over the entire collection of indexed objects.
+   */
+  def list: Iterator[Indexed]
+
+  /**
+   * Appends another index to this index.
+   *
+   * @tparam T The type of indexed object in the resulting index.
+   * @param that The index to append to this index.
+   * @return An index aggregating this index and the specified index.
+   */
+  final def ++[T >: Indexed <: AnyRef](that: Index[_ <: T]): Index[T] = {
+    val duplicates = Index.findDuplicates((ids ++ that.ids).toVector)
+    if (duplicates.nonEmpty) {
+      throw new IllegalStateException(s"Duplicate ID definitions in aggregate for: ${duplicates mkString ", "}.")
+    } else {
+      new www.Index.Aggregation[T](this, that)
     }
+  }
+
+}
+
+/**
+ * Factory for indexes
+ */
+object Index {
+
+  /** Work with UTF-8 files. */
+  implicit private def UTF8: scala.io.Codec = scala.io.Codec.UTF8
 
   /**
-   * Returns an iterator over the entire collection of indexed objects.
+   * Creates a new index of the data located at the specified path using the supplied class loader.
    *
-   * @return An iterator over the entire collection of indexed objects.
+   * @tparam Indexed The type of indexed object managed by the index.
+   * @param path        The path to load data from.
+   * @param classLoader The classloader to load data from, defaults to the class loader for `Index`.
+   * @param parse       The method that transforms the content of a resource into an indexed object.
+   * @return A new index of the data located at the specified path using the supplied class loader.
    */
-  def list: Iterator[Indexed] =
-    iterator map (_._2)
+  def apply[Indexed <: AnyRef](
+    path: String,
+    classLoader: ClassLoader = classOf[Index[_]].getClassLoader
+  )(
+    parse: (Metadata.Structure, String) => Indexed
+  ): Index[Indexed] = {
+    val keys = loadKeys(path, classLoader)
+    val keysById = keys flatMap (loadKeyByIds(_, classLoader))
+    val duplicates = findDuplicates(keysById.map(_._1))
+    if (duplicates.nonEmpty) {
+      throw new IllegalStateException(s"Duplicate ID definitions in $path for: ${duplicates mkString ", "}.")
+    } else {
+      new Source[Indexed](Resources(keys.toSet, keysById.toMap, classLoader), parse)
+    }
+  }
 
   /**
-   * Returns an iterator over the entire collection of indexed objects.
+   * Loads the keys available at the specified path.
    *
-   * @return An iterator over the entire collection of indexed objects.
+   * @param path        The path to search.
+   * @param classLoader The class loader to search with.
+   * @return The keys available at the specified path.
    */
-  private def iterator: Iterator[(String, Indexed)] =
-    keys.iterator map { key =>
-      key -> synchronized {
-        indexedByKey get key match {
-          case Some(SoftReference(indexed)) => indexed
-          case _ => load(key)
+  private def loadKeys(path: String, classLoader: ClassLoader): Vector[String] = {
+    val prefix = if (path endsWith "/") path else path + "/"
+    val source = scala.io.Source.fromResource(prefix, classLoader)
+    try source.getLines.filter(_ endsWith ".md").map(prefix + _).toVector
+    finally source.close()
+  }
+
+  /**
+   * Loads a mapping of the supplied key indexed by the IDs specified by the resource's front matter.
+   *
+   * @param key         The key of the resource to inspect.
+   * @param classLoader The class loader to load from.
+   * @return A mapping of the supplied key indexed by the IDs specified by the resource's front matter.
+   */
+  private def loadKeyByIds(key: String, classLoader: ClassLoader): Vector[(Id, String)] = {
+    val source = scala.io.Source.fromResource(key, classLoader)
+    try readFrontMatter(source.getLines.buffered) finally source.close()
+  }.get[Name]("name") map (_.ids) getOrElse Vector(Id(key)) map (_ -> key)
+
+  /**
+   * Reads a resource's front matter from an interator of lines.
+   *
+   * @param lines the lines to extract the front matter from.
+   * @return The extracted front matter.
+   */
+  private def readFrontMatter(lines: BufferedIterator[String]): Metadata.Structure =
+    if (lines.headOption.contains("---")) {
+      lines.next()
+      yaml.parser.parse(lines.takeWhile(_ != "---").mkString("\n")) match {
+        case Left(err) => throw err
+        case Right(metadata) => (metadata: Metadata) match {
+          case structure@Metadata.Structure(_) => structure
+          case _ => Metadata.Empty
         }
       }
-    }
+    } else Metadata.Empty
 
   /**
-   * Loads the object identified by the specified key.
+   * Returns any of the specified IDs that appear more than once.
    *
-   * @param key The key that identifies the object.
-   * @return The object identified by the specified key.
+   * @param ids The IDs to extract duplicates from.
+   * @return Any of the specified IDs that appear more than once.
    */
-  private def load(key: String): Indexed = {
-    val indexed = parse {
-      val source = io.Source.fromResource(key, classLoader)(io.Codec.UTF8)
-      try source.getLines mkString "\n" finally source.close()
+  private def findDuplicates(ids: Vector[Id]): Set[Id] =
+    ids.map(_ -> 1).groupBy(_._1).map {
+      case (id, counts) => id -> counts.map(_._2).sum
+    }.filter(_._2 > 1).keys.toSet
+
+  /**
+   * Metadata about the resources in an index.
+   *
+   * @param keys        The keys of the individual resources.
+   * @param keysById    The mapping of IDs to keys.
+   * @param classLoader The class loader to load resources from.
+   */
+  private case class Resources(keys: Set[String], keysById: Map[Id, String], classLoader: ClassLoader) {
+
+    /**
+     * Loads the data from the resource identified by the specified key.
+     *
+     * @param key The key that identifies the resource to load.
+     * @return The data from the resource identified by the specified key.
+     */
+    def load(key: String): (Metadata.Structure, String) = {
+      val source = scala.io.Source.fromResource(key, classLoader)
+      try {
+        val lines = source.getLines.buffered
+        val frontMatter = readFrontMatter(lines)
+        frontMatter -> (lines mkString "\n")
+      } finally source.close()
     }
-    val reference = SoftReference(indexed)
-    indexedById += indexed.name.id -> reference
-    indexed.name.alias foreach (indexedById += _ -> reference)
-    indexedByKey += key -> reference
-    indexed
+
+  }
+
+  /**
+   * A finite collection of indexed objects loaded from markdown files in the class path.
+   *
+   * @tparam Indexed The type of indexed object held in this source.
+   * @param resources The resources that make up this index.
+   * @param parse     The function that transforms text into indexed objects.
+   */
+  final private class Source[Indexed <: AnyRef](
+    resources: Index.Resources,
+    parse: (Metadata.Structure, String) => Indexed
+  ) extends Index[Indexed] {
+
+    /** The cache of indexed objects by resource key. */
+    private val indexedByKey = collection.mutable.Map[String, SoftReference[Indexed]]()
+
+    /* Return an iterator over the entire collection of indexed IDs. */
+    override def ids: Iterator[Id] =
+      resources.keysById.keys.iterator
+
+    /* Attempt to materialize the indexed object found under the specified ID. */
+    override def find(id: Id): Option[Indexed] =
+      resources.keysById get id map materialize
+
+    /* Return an iterator over the entire collection of indexed objects. */
+    override def list: Iterator[Indexed] =
+      resources.keysById.values.toVector.distinct.iterator map materialize
+
+    /**
+     * Materializes an indexed object from the cache or from disk.
+     *
+     * @param key The key of the indexed object to materialize.
+     * @return The materialized object.
+     */
+    private def materialize(key: String): Indexed =
+      indexedByKey synchronized {
+        indexedByKey get key collect { case SoftReference(indexed) => indexed } getOrElse {
+          val indexed = parse.tupled(resources.load(key))
+          indexedByKey += key -> SoftReference(indexed)
+          indexed
+        }
+      }
+
+  }
+
+  /**
+   * An aggregation of indexed objects.
+   *
+   * @tparam Indexed The type of indexed object held in this aggregation.
+   * @param first  The first group of indexed objects to aggregate.
+   * @param second The second group of indexed objects to aggregate.
+   */
+  final private class Aggregation[Indexed <: AnyRef](
+    first: Index[_ <: Indexed],
+    second: Index[_ <: Indexed]
+  ) extends Index[Indexed] {
+
+    /* Return an iterator over the entire collection of indexed IDs. */
+    override def ids: Iterator[Id] =
+      first.ids ++ second.ids
+
+    /* Attempt to materialize the indexed object found under the specified ID. */
+    override def find(id: Id): Option[Indexed] =
+      first.find(id) orElse second.find(id)
+
+    /* Return an iterator over the entire collection of indexed objects. */
+    override def list: Iterator[Indexed] =
+      first.list ++ second.list
+
+
   }
 
 }

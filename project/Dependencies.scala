@@ -2,6 +2,9 @@ import sbt._
 
 object Dependencies {
 
+  lazy val circeCore = "io.circe" %% "circe-core" % "0.9.1"
+  lazy val circeGeneric = "io.circe" %% "circe-generic" % "0.9.1"
+  lazy val circeYaml = "io.circe" %% "circe-yaml" % "0.7.0"
   lazy val flexmark = "com.vladsch.flexmark" % "flexmark-all" % "0.30.0"
   lazy val scalaTags = "com.lihaoyi" %% "scalatags" % "0.6.7"
   lazy val scalaCss = "com.github.japgolly.scalacss" %% "ext-scalatags" % "0.5.3"
