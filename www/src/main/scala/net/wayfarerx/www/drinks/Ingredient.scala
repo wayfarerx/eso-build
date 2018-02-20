@@ -20,15 +20,24 @@ package net.wayfarerx.www
 package drinks
 
 /**
-  * Base type for all ingredients.
-  */
-sealed trait Ingredient {
+ * Definition of an ingredient in a cocktail.
+ *
+ * @param name The name of this ingredient.
+ */
+case class Ingredient(
+  name: Name
+)
 
-  /** The name of this ingredient. */
-  def name: Name
-
-}
-
+/**
+ * Factory and repository for all ingredients.
+ */
 object Ingredient {
+
+  /** Repository of all known ingredients. */
+  lazy val Ingredients: Index[Ingredient] =
+    Index[Ingredient]("drinks/ingredients") { text =>
+      val doc = Content.Document(text)
+      Ingredient(doc.name)
+    }
 
 }

@@ -17,7 +17,7 @@
  */
 
 package net.wayfarerx.www
-package main
+package home
 
 import java.nio.file.Paths
 import java.util.concurrent.atomic.AtomicLong

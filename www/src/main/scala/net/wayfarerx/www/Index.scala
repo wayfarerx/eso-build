@@ -1,5 +1,5 @@
 /*
- * Indexer.scala
+ * Index.scala
  *
  * Copyright 2018 wayfarerx <x@wayfarerx.net> (@thewayfarerx)
  *
@@ -19,7 +19,6 @@
 package net.wayfarerx.www
 
 import ref.SoftReference
-import io.circe.yaml
 import net.wayfarerx.www
 
 /**
@@ -28,7 +27,7 @@ import net.wayfarerx.www
 sealed trait Index[Indexed <: AnyRef] {
 
   /** The IDs managed by this index. */
-  def ids: Iterator[Id]
+  def ids: Set[Id]
 
   /**
    * Attempts to return the indexed object found under the specified ID.
@@ -53,7 +52,7 @@ sealed trait Index[Indexed <: AnyRef] {
    * @return An index aggregating this index and the specified index.
    */
   final def ++[T >: Indexed <: AnyRef](that: Index[_ <: T]): Index[T] = {
-    val duplicates = Index.findDuplicates((ids ++ that.ids).toVector)
+    val duplicates = Index.findDuplicates(ids.toVector ++ that.ids)
     if (duplicates.nonEmpty) {
       throw new IllegalStateException(s"Duplicate ID definitions in aggregate for: ${duplicates mkString ", "}.")
     } else {
@@ -71,6 +70,10 @@ object Index {
   /** Work with UTF-8 files. */
   implicit private def UTF8: scala.io.Codec = scala.io.Codec.UTF8
 
+  /** The suffix to match on the title to build singular and plural names. */
+  private val TitlePattern =
+    """\(([^\|\(\)]+)(\|([^\|\(\)]+))?\)$""".r
+
   /**
    * Creates a new index of the data located at the specified path using the supplied class loader.
    *
@@ -84,7 +87,7 @@ object Index {
     path: String,
     classLoader: ClassLoader = classOf[Index[_]].getClassLoader
   )(
-    parse: (Metadata.Structure, String) => Indexed
+    parse: String => Indexed
   ): Index[Indexed] = {
     val keys = loadKeys(path, classLoader)
     val keysById = keys flatMap (loadKeyByIds(_, classLoader))
@@ -119,8 +122,8 @@ object Index {
    */
   private def loadKeyByIds(key: String, classLoader: ClassLoader): Vector[(Id, String)] = {
     val source = scala.io.Source.fromResource(key, classLoader)
-    try readFrontMatter(source.getLines.buffered) finally source.close()
-  }.get[Name]("name") map (_.ids) getOrElse Vector(Id(key)) map (_ -> key)
+    try readName(source.getLines.buffered) finally source.close()
+  } map (_.ids) getOrElse Vector(Id(key)) map (_ -> key)
 
   /**
    * Reads a resource's front matter from an interator of lines.
@@ -128,17 +131,12 @@ object Index {
    * @param lines the lines to extract the front matter from.
    * @return The extracted front matter.
    */
-  private def readFrontMatter(lines: BufferedIterator[String]): Metadata.Structure =
-    if (lines.headOption.contains("---")) {
-      lines.next()
-      yaml.parser.parse(lines.takeWhile(_ != "---").mkString("\n")) match {
-        case Left(err) => throw err
-        case Right(metadata) => (metadata: Metadata) match {
-          case structure@Metadata.Structure(_) => structure
-          case _ => Metadata.Empty
-        }
-      }
-    } else Metadata.Empty
+  private def readName(lines: BufferedIterator[String]): Option[Name] ={
+    while(lines.headOption.exists(_.trim.isEmpty)) lines.next()
+    lines.headOption collect {
+      case title if title.trim.startsWith("# ") => Name(title.substring(title.indexOf('#') + 1).trim)
+    }
+  }
 
   /**
    * Returns any of the specified IDs that appear more than once.
@@ -146,10 +144,8 @@ object Index {
    * @param ids The IDs to extract duplicates from.
    * @return Any of the specified IDs that appear more than once.
    */
-  private def findDuplicates(ids: Vector[Id]): Set[Id] =
-    ids.map(_ -> 1).groupBy(_._1).map {
-      case (id, counts) => id -> counts.map(_._2).sum
-    }.filter(_._2 > 1).keys.toSet
+  private def findDuplicates(ids: Iterable[Id]): Set[Id] =
+    ids.map(_ -> 1).groupBy(_._1).map { case (id, counts) => id -> counts.map(_._2).sum }.filter(_._2 > 1).keys.toSet
 
   /**
    * Metadata about the resources in an index.
@@ -166,13 +162,9 @@ object Index {
      * @param key The key that identifies the resource to load.
      * @return The data from the resource identified by the specified key.
      */
-    def load(key: String): (Metadata.Structure, String) = {
+    def load(key: String): String = {
       val source = scala.io.Source.fromResource(key, classLoader)
-      try {
-        val lines = source.getLines.buffered
-        val frontMatter = readFrontMatter(lines)
-        frontMatter -> (lines mkString "\n")
-      } finally source.close()
+      try source.getLines mkString "\n" finally source.close()
     }
 
   }
@@ -186,15 +178,15 @@ object Index {
    */
   final private class Source[Indexed <: AnyRef](
     resources: Index.Resources,
-    parse: (Metadata.Structure, String) => Indexed
+    parse: String => Indexed
   ) extends Index[Indexed] {
 
     /** The cache of indexed objects by resource key. */
     private val indexedByKey = collection.mutable.Map[String, SoftReference[Indexed]]()
 
     /* Return an iterator over the entire collection of indexed IDs. */
-    override def ids: Iterator[Id] =
-      resources.keysById.keys.iterator
+    override def ids: Set[Id] =
+      resources.keysById.keys.toSet
 
     /* Attempt to materialize the indexed object found under the specified ID. */
     override def find(id: Id): Option[Indexed] =
@@ -213,7 +205,7 @@ object Index {
     private def materialize(key: String): Indexed =
       indexedByKey synchronized {
         indexedByKey get key collect { case SoftReference(indexed) => indexed } getOrElse {
-          val indexed = parse.tupled(resources.load(key))
+          val indexed = parse(resources.load(key))
           indexedByKey += key -> SoftReference(indexed)
           indexed
         }
@@ -234,7 +226,7 @@ object Index {
   ) extends Index[Indexed] {
 
     /* Return an iterator over the entire collection of indexed IDs. */
-    override def ids: Iterator[Id] =
+    override def ids: Set[Id] =
       first.ids ++ second.ids
 
     /* Attempt to materialize the indexed object found under the specified ID. */

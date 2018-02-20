@@ -27,7 +27,7 @@ import fs2.Stream
 /**
  * Global declarations for the main package.
  */
-package object main {
+package object home {
 
   /** The indent to use when rendering text. */
   val Indent: String = "  "

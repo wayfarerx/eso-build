@@ -1,1 +1,4 @@
+---
+name: whiskey
+---
 # Whiskey

@@ -17,7 +17,7 @@
  */
 
 package net.wayfarerx.www
-package main
+package home
 
 import cats.effect.IO
 import fs2.{Stream, io}

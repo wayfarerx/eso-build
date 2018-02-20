@@ -1,4 +1,1 @@
----
-name: Other Mock
----
-mock2
+# Other Mock

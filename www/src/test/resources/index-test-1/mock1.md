@@ -1,6 +1,1 @@
----
-name:
-  singular: Mock
-  plural: Mocks
----
-mock1
+# Mock(s)

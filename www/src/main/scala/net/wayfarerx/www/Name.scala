@@ -82,9 +82,6 @@ case class Name(singular: String, plural: String) {
     case _ => pluralFormalized
   }
 
-  /* Return the default form. */
-  override def toString: String = apply()
-
 }
 
 /**
@@ -92,15 +89,9 @@ case class Name(singular: String, plural: String) {
  */
 object Name {
 
-  /** Support for converting metadata into names. */
-  implicit val MetadataSupport: Metadata.FromMetadata[Name] = {
-    case structure@Metadata.Structure(_) =>
-      structure.get[String]("singular") map { singular =>
-        structure.get[String]("plural") map (plural => Name(singular, plural)) getOrElse Name(singular)
-      }
-    case Metadata.Value(singular) => Some(Name(singular))
-    case _ => None
-  }
+  /** The suffix to match to build singular and plural names. */
+  private val CompoundPattern =
+    """\(([^\|\(\)]+)(\|([^\|\(\)]+))?\)$""".r
 
   /** The pattern of word to match when formalizing. */
   private val CapitalizePattern =
@@ -160,8 +151,21 @@ object Name {
    * @param name The name to use.
    * @return A name with the same singular and plural forms.
    */
-  def apply(name: String): Name =
-    Name(name, name)
+  def apply(name: String): Name = {
+    CompoundPattern.findFirstIn(name) match {
+      case Some(found) =>
+        val prefix = name.substring(0, name.length - found.length)
+        val suffix = found.substring(1, found.length - 1)
+        suffix.indexOf('|') match {
+          case index if index > 0 =>
+            Name(prefix + suffix.substring(0, index), prefix + suffix.substring(index + 1, suffix.length))
+          case _ =>
+            Name(prefix, prefix + suffix)
+        }
+      case None =>
+        Name(name, name)
+    }
+  }
 
   /**
    * Capitalizes a string as if it was at the start of a sentence.
@@ -170,10 +174,11 @@ object Name {
    * @return The string capitalized as if it was at the start of a sentence.
    */
   private def capitalize(str: String): String =
-    CapitalizePattern.findFirstMatchIn(str) map { letter =>
-      (if (letter.start > 0) str.substring(0, letter.start) else "") +
-        str.substring(letter.start, letter.end).toUpperCase +
-        (if (letter.end < str.length) str.substring(letter.end, str.length) else "")
+    CapitalizePattern.findFirstMatchIn(str) map {
+      letter =>
+        (if (letter.start > 0) str.substring(0, letter.start) else "") +
+          str.substring(letter.start, letter.end).toUpperCase +
+          (if (letter.end < str.length) str.substring(letter.end, str.length) else "")
     } getOrElse str
 
   /**
@@ -186,11 +191,12 @@ object Name {
     if (str.isEmpty) str else {
       var result = Vector[String]()
       var cursor = 0
-      FormalizePattern.findAllMatchIn(str) foreach { word =>
-        if (word.start > cursor) result :+= str.substring(cursor, word.start)
-        val text = str.substring(word.start, word.end)
-        result :+= (if (cursor > 0 && FormalizeIgnore(text.toLowerCase)) text else capitalize(text))
-        cursor = word.end
+      FormalizePattern.findAllMatchIn(str) foreach {
+        word =>
+          if (word.start > cursor) result :+= str.substring(cursor, word.start)
+          val text = str.substring(word.start, word.end)
+          result :+= (if (cursor > 0 && FormalizeIgnore(text.toLowerCase)) text else capitalize(text))
+          cursor = word.end
       }
       ((if (result.size > 1) result.init :+ capitalize(result.last) else result) :+ str.substring(cursor)).mkString
     }

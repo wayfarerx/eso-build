@@ -32,7 +32,6 @@ class NameSpec extends FlatSpec with Matchers {
     oranges.id shouldBe Id("fresh-orange")
     oranges.alias shouldBe Some(Id("fresh-oranges"))
     oranges.ids shouldBe Vector(Id("fresh-orange"), Id("fresh-oranges"))
-    oranges.toString shouldBe "fresh orange"
     oranges() shouldBe "fresh orange"
     oranges(0) shouldBe "fresh oranges"
     oranges(Math.PI) shouldBe "fresh oranges"
@@ -61,6 +60,12 @@ class NameSpec extends FlatSpec with Matchers {
 
   it should "formalize complex sentences" in {
     Name("it's time to go to the whatever.").formalized() shouldBe "It's Time to Go to the Whatever."
+  }
+
+  it should "materialize itself from compound name strings" in {
+    Name("id") shouldBe Name("id", "id")
+    Name("name(s)") shouldBe Name("name", "names")
+    Name("cherr(y|ies)") shouldBe Name("cherry", "cherries")
   }
 
 }

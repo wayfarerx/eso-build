@@ -13,7 +13,7 @@ lazy val www = (project in file("www")).
     libraryDependencies += circeCore,
     libraryDependencies += circeGeneric,
     libraryDependencies += circeYaml,
-    libraryDependencies += flexmark,
+    libraryDependencies += laika,
     libraryDependencies += scalaTest % Test
   )
 

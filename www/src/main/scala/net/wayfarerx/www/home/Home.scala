@@ -17,7 +17,7 @@
  */
 
 package net.wayfarerx.www
-package main
+package home
 
 /**
  * Representation of the site's home page.

@@ -27,33 +27,32 @@ class IndexSpec extends FlatSpec with Matchers {
 
   behavior of "Index"
 
-  val Parse: (Metadata, String) => String = (_, s) => s
+  val Parse: String => String = identity
 
   it should "Load resources from the classpath" in {
     val index1 = Index[String]("index-test-1", classOf[IndexSpec].getClassLoader)(Parse)
-    index1.ids.toVector shouldBe Vector(Id("mock"), Id("mocks"), Id("other-mock"))
+    index1.ids shouldBe Set(Id("mock"), Id("mocks"), Id("other-mock"))
     index1.find(Id("foo")) shouldBe None
-    index1.find(Id("mock")) shouldBe Some("mock1")
-    index1.find(Id("mocks")) shouldBe Some("mock1")
-    index1.find(Id("other-mock")) shouldBe Some("mock2")
-    index1.list.toVector shouldBe Vector("mock1", "mock2")
+    index1.find(Id("mock")) shouldBe Some("# Mock(s)")
+    index1.find(Id("mocks")) shouldBe Some("# Mock(s)")
+    index1.find(Id("other-mock")) shouldBe Some("# Other Mock")
+    index1.list.toVector shouldBe Vector("# Mock(s)", "# Other Mock")
     val index2 = Index[String]("index-test-2", classOf[IndexSpec].getClassLoader)(Parse)
-    index2.ids.toVector shouldBe Vector(Id("last-mock"))
+    index2.ids shouldBe Set(Id("last-mock"))
     index2.find(Id("foo")) shouldBe None
     index2.find(Id("mock")) shouldBe None
     index2.find(Id("mocks")) shouldBe None
     index2.find(Id("other-mock")) shouldBe None
-    index2.find(Id("last-mock")) shouldBe Some("mock3")
-    index2.list.toVector shouldBe Vector("mock3")
+    index2.find(Id("last-mock")) shouldBe Some("# Last Mock")
+    index2.list.toVector shouldBe Vector("# Last Mock")
     val index3 = index1 ++ index2
-    index3.ids.toVector shouldBe
-      Vector(Id("mock"), Id("mocks"), Id("other-mock"), Id("last-mock"))
+    index3.ids shouldBe Set(Id("mock"), Id("mocks"), Id("other-mock"), Id("last-mock"))
     index3.find(Id("foo")) shouldBe None
-    index3.find(Id("mock")) shouldBe Some("mock1")
-    index3.find(Id("mocks")) shouldBe Some("mock1")
-    index3.find(Id("other-mock")) shouldBe Some("mock2")
-    index3.find(Id("last-mock")) shouldBe Some("mock3")
-    index3.list.toVector shouldBe Vector("mock1", "mock2", "mock3")
+    index3.find(Id("mock")) shouldBe Some("# Mock(s)")
+    index3.find(Id("mocks")) shouldBe Some("# Mock(s)")
+    index3.find(Id("other-mock")) shouldBe Some("# Other Mock")
+    index3.find(Id("last-mock")) shouldBe Some("# Last Mock")
+    index3.list.toVector shouldBe Vector("# Mock(s)", "# Other Mock", "# Last Mock")
   }
 
   it should "detect duplicate IDs in resources" in {
