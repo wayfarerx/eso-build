@@ -12,10 +12,10 @@ A before dinner cocktail made with [rye whiskey]() and [sweet vermouth]().
 
 ## Tools
 
-- [ice]()
-- [mixing glass]()
-- [mixing spoon]()
-- [strainer]()
+- [Ice]()
+- [Mixing glass]()
+- [Mixing spoon]()
+- [Strainer]()
 
 ## Instructions
 

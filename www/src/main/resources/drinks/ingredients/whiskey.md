@@ -1,4 +1,0 @@
----
-name: whiskey
----
-# Whiskey
