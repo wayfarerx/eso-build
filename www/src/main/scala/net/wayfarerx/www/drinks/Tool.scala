@@ -1,5 +1,5 @@
 /*
- * Ingredient.scala
+ * Tool.scala
  *
  * Copyright 2018 wayfarerx <x@wayfarerx.net> (@thewayfarerx)
  *
@@ -19,33 +19,6 @@
 package net.wayfarerx.www
 package drinks
 
-/**
- * Definition of an ingredient in a cocktail.
- *
- * @param name The name of this ingredient.
- */
-case class Ingredient(
-  name: Name,
-  description: Content.Inline.Fragment,
-  links: Vector[Content.Link]
-)
-
-/**
- * Factory and repository for all ingredients.
- */
-object Ingredient {
-
-  /** Repository of all known ingredients. */
-  lazy val Ingredients: Index[Ingredient] = Seq(
-    "fruits",
-    "mixers",
-    "spirits",
-    "wines"
-  ) map { name =>
-    Index[Ingredient](s"drinks/$name") { text =>
-      val doc = Content.Document(text)
-      Ingredient(doc.name, ???)
-    }
-  } reduce (_ ++ _)
+trait Tool {
 
 }

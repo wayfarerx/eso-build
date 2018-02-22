@@ -8,14 +8,14 @@ A before dinner cocktail made with [rye whiskey]() and [sweet vermouth]().
 - 2 cl [sweet vermouth]()
 - 1 dash [Angostura bitters]()
 - [Maraschino cherry]()
+- [Ice]()
 - chilled [cocktail glass]()
 
 ## Tools
 
-- [Ice]()
 - [Mixing glass]()
 - [Mixing spoon]()
-- [Strainer]()
+- [Cocktail strainer]()
 
 ## Instructions
 

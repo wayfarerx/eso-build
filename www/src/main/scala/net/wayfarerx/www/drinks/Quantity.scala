@@ -75,6 +75,9 @@ object Quantity {
   /** The unit of volume equal to one liter. */
   val Liters: Unit = Unit("L", Name("liter", "liters"))
 
+  /** The unit of volume equal to 1/32nd of a US fluid ounce. */
+  val Dash: Unit = Unit("dash", Name("dash", "dashes"))
+
   /** The unit of volume equal to one US teaspoon. */
   val Teaspoon: Unit = Unit("tsp", Name("teaspoon", "teaspoons"))
 

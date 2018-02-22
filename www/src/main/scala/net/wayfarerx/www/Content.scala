@@ -18,6 +18,8 @@
 
 package net.wayfarerx.www
 
+import java.net.URI
+
 /**
  * Base type for all items in the content tree.
  */
@@ -31,39 +33,6 @@ object Content {
   //
   // Base types and categories.
   //
-
-  /**
-   * Base type for all block items in the content tree.
-   */
-  sealed trait Block extends Content
-
-  /**
-   * Types associated with block content.
-   */
-  object Block {
-
-    /** A collection of block content. */
-    type Fragment = Vector[Block]
-
-    /**
-     * Factory for block content collections.
-     */
-    object Fragment {
-
-      /** The empty block content collection. */
-      def empty: Fragment = Vector.empty
-
-      /**
-       * Creates an block content collection containing the specified items.
-       *
-       * @param items The items to include in the collection.
-       * @return An block content collection containing the specified items.
-       */
-      def apply(items: Block*): Fragment = Vector(items: _*)
-
-    }
-
-  }
 
   /**
    * Base type for all inline items in the content tree.
@@ -98,8 +67,71 @@ object Content {
 
   }
 
+  /**
+   * Base type for all block items in the content tree.
+   */
+  sealed trait Block extends Content
+
+  /**
+   * Types associated with block content.
+   */
+  object Block {
+
+    /** A collection of block content. */
+    type Fragment = Vector[Block]
+
+    /**
+     * Factory for block content collections.
+     */
+    object Fragment {
+
+      /** The empty block content collection. */
+      def empty: Fragment = Vector.empty
+
+      /**
+       * Creates an block content collection containing the specified items.
+       *
+       * @param items The items to include in the collection.
+       * @return An block content collection containing the specified items.
+       */
+      def apply(items: Block*): Fragment = Vector(items: _*)
+
+    }
+
+  }
+
   //
-  // Specific implementations.
+  // Inline implementations.
+  //
+
+  /**
+   * Base type for all links.
+   */
+  sealed trait Link extends Inline
+
+  /**
+   * Definitions of the types of links.
+   */
+  object Link {
+
+    /**
+     * A link to another page in the site.
+     *
+     * @param target The ID of the target page.
+     */
+    case class Internal(target: Id) extends Link
+
+    /**
+     * A link to a page on another site.
+     *
+     * @param target The URI of the target page.
+     */
+    case class External(target: URI) extends Link
+
+  }
+
+  //
+  // Block implementations.
   //
 
   /**
@@ -110,7 +142,9 @@ object Content {
    */
   case class Header(level: Int, content: Inline.Fragment) extends Block
 
-
+  //
+  // Document implementation.
+  //
 
   /**
    * The root of the content tree.
