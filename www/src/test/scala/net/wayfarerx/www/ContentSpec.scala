@@ -1,5 +1,5 @@
 /*
- * Tool.scala
+ * ContentSpec.scala
  *
  * Copyright 2018 wayfarerx <x@wayfarerx.net> (@thewayfarerx)
  *
@@ -17,8 +17,38 @@
  */
 
 package net.wayfarerx.www
-package drinks
 
-trait Tool {
+import org.scalatest._
+
+/**
+ * Test suite for the Content type.
+ */
+class ContentSpec extends FlatSpec with Matchers {
+
+  behavior of "Content"
+
+  it should "parse markdown documents" in {
+    val doc = Content.Document(
+      """
+        |# Name
+        |
+        |A very important document.
+        |
+        |## Cool Stuff
+        |
+        |Super cool things happening.
+        |
+        |## Other Stuff
+        |
+        |Check this out.
+        |
+        |## Links
+        |
+        | - https://wayfarerx.net/
+        | - https://twitter.com/thewayfarerx/
+        |
+      """.stripMargin)
+
+  }
 
 }

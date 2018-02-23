@@ -21,7 +21,7 @@ package drinks
 
 case class Cocktail(
   name: Name,
-  components: Vector[(Ingredient, Quantity)]
+  components: Vector[(Component, Quantity)]
 )
 
 object Cocktail {

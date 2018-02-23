@@ -2,7 +2,7 @@
 
 A before dinner cocktail made with [rye whiskey]() and [sweet vermouth]().
 
-## Ingredients
+## Components
 
 - 5 cl [rye whiskey]()
 - 2 cl [sweet vermouth]()
@@ -10,9 +10,6 @@ A before dinner cocktail made with [rye whiskey]() and [sweet vermouth]().
 - [Maraschino cherry]()
 - [Ice]()
 - chilled [cocktail glass]()
-
-## Tools
-
 - [Mixing glass]()
 - [Mixing spoon]()
 - [Cocktail strainer]()
