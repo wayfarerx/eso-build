@@ -18,6 +18,8 @@
 
 package net.wayfarerx.www
 
+import java.net.URI
+
 import org.scalatest._
 
 /**
@@ -28,9 +30,8 @@ class ContentSpec extends FlatSpec with Matchers {
   behavior of "Content"
 
   it should "parse markdown documents" in {
-    val doc = Content.Document(
-      """
-        |# Name
+    import Content._
+    Document("""# Name
         |
         |A very important document.
         |
@@ -44,10 +45,26 @@ class ContentSpec extends FlatSpec with Matchers {
         |
         |## Links
         |
-        | - https://wayfarerx.net/
-        | - https://twitter.com/thewayfarerx/
-        |
-      """.stripMargin)
+        |- [Cool stuff](#cool-stuff)
+        |- [whiskey]()
+        |- [Yum](cocktail-glass)
+        |- [website](https://wayfarerx.net/)
+        |- [twitter](https://twitter.com/thewayfarerx/)
+        |""".stripMargin) shouldBe Document(
+      Name("Name"),
+      Paragraph(Text("A very important document.")),
+      Vector(
+        Section(Header(2, Text("Cool Stuff")), Paragraph(Text("Super cool things happening."))),
+        Section(Header(2, Text("Other Stuff")), Paragraph(Text("Check this out.")))
+      ),
+      Vector(
+        Link.Local(Id("cool-stuff"), Text("Cool stuff")),
+        Link.Internal(Id("whiskey"), Text("whiskey")),
+        Link.Internal(Id("cocktail-glass"), Text("Yum")),
+        Link.External(new URI("https://wayfarerx.net/"), Text("website")),
+        Link.External(new URI("https://twitter.com/thewayfarerx/"), Text("twitter"))
+      )
+    )
 
   }
 

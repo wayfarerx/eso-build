@@ -34,7 +34,7 @@ sealed trait Component {
   def sections: Vector[Content.Section]
 
   /** The links specified by this component. */
-  def links: Vector[Content.Link.External]
+  def links: Vector[Content.Link]
 
 }
 
@@ -51,7 +51,7 @@ object Component {
     name: Name,
     description: Content.Paragraph,
     sections: Vector[Content.Section],
-    links: Vector[Content.Link.External]
+    links: Vector[Content.Link]
   ) extends Component
 
   object Drinkware {
@@ -68,7 +68,7 @@ object Component {
     name: Name,
     description: Content.Paragraph,
     sections: Vector[Content.Section],
-    links: Vector[Content.Link.External]
+    links: Vector[Content.Link]
   ) extends Component
 
   object Ingredient {
@@ -91,7 +91,7 @@ object Component {
     name: Name,
     description: Content.Paragraph,
     sections: Vector[Content.Section],
-    links: Vector[Content.Link.External]
+    links: Vector[Content.Link]
   ) extends Component
 
   object Tool {
