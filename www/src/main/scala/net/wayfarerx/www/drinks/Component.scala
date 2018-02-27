@@ -21,87 +21,58 @@ package drinks
 
 /**
  * Definition of a component of a cocktail.
+ *
+ * @param name        The name of this component.
+ * @param description The simple description of this component.
+ * @param sections    The sections of this component.
+ * @param links       The links specified by this component.
  */
-sealed trait Component {
-
-  /** The name of this component. */
-  def name: Name
-
-  /** The simple description of this component. */
-  def description: Content.Paragraph
-
-  /** The simple description of this component. */
-  def sections: Vector[Content.Section]
-
-  /** The links specified by this component. */
-  def links: Vector[Content.Link]
-
-}
+case class Component(
+  name: Name,
+  description: Content.Paragraph,
+  sections: Vector[Content.Section],
+  links: Vector[Content.Link],
+  usage: Component.Usage
+)
 
 /**
- * Factory and repository for all ingredients.
+ * Repository for all components.
  */
 object Component {
 
   /** Repository of all known ingredients. */
-  lazy val All: Index[Component] =
-    Drinkware.All ++ Ingredient.All ++ Tool.All
+  lazy val All: Index[Component] = Seq(
+    "drinkware" -> Drinkware,
+    "equipment" -> Equipment,
+    "fruits" -> Ingredient,
+    "mixers" -> Ingredient,
+    "spirits" -> Ingredient,
+    "wines" -> Ingredient
+  ) map {
+    case (path, usage) => Index[Component](s"drinks/$path") { text =>
+      val doc = Content.Document(text)
+      Component(doc.name, doc.description, doc.sections, doc.links, usage)
+    }
+  } reduce (_ ++ _)
 
-  case class Drinkware(
-    name: Name,
-    description: Content.Paragraph,
-    sections: Vector[Content.Section],
-    links: Vector[Content.Link]
-  ) extends Component
+  /**
+   * Base type for the usage categories.
+   */
+  sealed trait Usage
 
-  object Drinkware {
+  /**
+   * Signifies that the component is drinkware served with a drink.
+   */
+  case object Drinkware extends Usage
 
-    lazy val All: Index[Drinkware] =
-      Index[Drinkware](s"drinks/drinkware") { text =>
-        val doc = Content.Document(text)
-        Drinkware(doc.name, doc.description, doc.sections, doc.links)
-      }
+  /**
+   * Signifies that the component is equipment used to construct a drink.
+   */
+  case object Equipment extends Usage
 
-  }
-
-  case class Ingredient(
-    name: Name,
-    description: Content.Paragraph,
-    sections: Vector[Content.Section],
-    links: Vector[Content.Link]
-  ) extends Component
-
-  object Ingredient {
-
-    lazy val All: Index[Ingredient] = Seq(
-      "fruits",
-      "mixers",
-      "spirits",
-      "wines"
-    ) map { name =>
-      Index[Ingredient](s"drinks/$name") { text =>
-        val doc = Content.Document(text)
-        Ingredient(doc.name, doc.description, doc.sections, doc.links)
-      }
-    } reduce (_ ++ _)
-
-  }
-
-  case class Tool(
-    name: Name,
-    description: Content.Paragraph,
-    sections: Vector[Content.Section],
-    links: Vector[Content.Link]
-  ) extends Component
-
-  object Tool {
-
-    lazy val All: Index[Tool] =
-      Index[Tool](s"drinks/tools") { text =>
-        val doc = Content.Document(text)
-        Tool(doc.name, doc.description, doc.sections, doc.links)
-      }
-
-  }
+  /**
+   * Signifies that the component is an ingredient used in a drink.
+   */
+  case object Ingredient extends Usage
 
 }

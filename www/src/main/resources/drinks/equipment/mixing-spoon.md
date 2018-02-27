@@ -4,4 +4,4 @@ A tool, typically with an extra-long handle, used to stir cocktails during prepa
 
 ## Links
 
- - [Spoon at Wikipedia](https://en.wikipedia.org/wiki/Spoon)
+- [Spoon at Wikipedia](https://en.wikipedia.org/wiki/Spoon)

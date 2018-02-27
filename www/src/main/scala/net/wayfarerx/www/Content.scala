@@ -39,8 +39,8 @@ sealed trait Content {
    */
   def strip: Vector[String]
 
-  /* Strip the formatting and convert this content into text. */
-  final override def toString: String = strip map (_.trim) filterNot (_.isEmpty) mkString Content.Space
+  /** Returns the words in this content delimited by spaces. */
+  final def stripped: String = strip map (_.trim) filterNot (_.isEmpty) mkString " "
 
 }
 
@@ -48,9 +48,6 @@ sealed trait Content {
  * Definitions of the items in the content tree.
  */
 object Content {
-
-  /** The new line token. */
-  private val Space = " "
 
   //
   // Base types and categories.
@@ -303,7 +300,12 @@ object Content {
      * @param content The content of the resulting link.
      * @return A link from the specified target and content.
      */
-    def apply(target: String, title: Option[String], content: Inline*): Link = target match {
+    def apply(target: String, title: Option[String], content: Inline*): Link = {
+      target.trim match {
+        case "" => Inline.Group(content: _*).stripped
+        case nonEmpty => nonEmpty
+      }
+    } match {
       case LocalPattern(id) => Local(Id(id), title, content: _*)
       case ExternalPattern(uri) => External(new URI(uri), title, Inline.Group(content: _*))
       case internal => Internal(Id(internal), title, Inline.Group(content: _*))
@@ -668,42 +670,42 @@ object Content {
         sections.flatMap(_.strip) ++
         links.flatMap(_.strip)
 
+  }
+
+  /**
+   * Factory and parser for documents.
+   */
+  object Document extends {
+
     /**
-     * Factory and parser for documents.
+     * Creates a document by parsing the supplied markdown.
+     *
+     * @param markdown The markdown to parse into a document.
+     * @return The document resulting from parsing the supplied markdown.
      */
-    object Document extends {
-
-      /**
-       * Creates a document by parsing the supplied markdown.
-       *
-       * @param markdown The markdown to parse into a document.
-       * @return The document resulting from parsing the supplied markdown.
-       */
-      def apply(markdown: String): Document = {
-        val astName +: astDescription +: astSections = (Parse as Markdown fromString markdown).content.content.toVector
-        val name: Name = astName match {
-          case Elements.Title(Seq(Elements.Text(n, _)), _) => Name(n)
-          case invalid => throw new IllegalArgumentException(s"Initial element was not a title: $invalid")
-        }
-        val description: Paragraph = astDescription match {
-          case Elements.Paragraph(spans, _) => Paragraph(Inline.Group(spans map (Inline(_)): _*))
-          case invalid => throw new IllegalArgumentException(s"Secondary element was not a paragraph: $invalid")
-        }
-        val (linksSections, sections): (Vector[Section], Vector[Section]) = astSections map {
-          case Elements.Section(Elements.Header(level, header, _), content, _) =>
-            Section(Header(level, Inline.Group(header map (Inline(_)): _*)), content map (Block(_)): _*)
-          case invalid => throw new IllegalArgumentException(s"Subsequent element was not a section: $invalid")
-        } partition {
-          case Section(Header(2, Text(linksHeader)), _) if linksHeader.trim.equalsIgnoreCase("links") => true
-          case _ => false
-        }
-        val links: Vector[Link] = linksSections.map(_.content).flatMap {
-          case List(items) => items collect { case link@Link(_, _, _) => link }
-          case _ => Vector()
-        }
-        Document(name, description, sections, links)
+    def apply(markdown: String): Document = {
+      val astName +: astDescription +: astSections = (Parse as Markdown fromString markdown).content.content.toVector
+      val name: Name = astName match {
+        case Elements.Title(Seq(Elements.Text(n, _)), _) => Name(n)
+        case invalid => throw new IllegalArgumentException(s"Initial element was not a title: $invalid")
       }
-
+      val description: Paragraph = astDescription match {
+        case Elements.Paragraph(spans, _) => Paragraph(Inline.Group(spans map (Inline(_)): _*))
+        case invalid => throw new IllegalArgumentException(s"Secondary element was not a paragraph: $invalid")
+      }
+      val (linksSections, sections): (Vector[Section], Vector[Section]) = astSections map {
+        case Elements.Section(Elements.Header(level, header, _), content, _) =>
+          Section(Header(level, Inline.Group(header map (Inline(_)): _*)), content map (Block(_)): _*)
+        case invalid => throw new IllegalArgumentException(s"Subsequent element was not a section: $invalid")
+      } partition {
+        case Section(Header(2, Text(linksHeader)), _) if linksHeader.trim.equalsIgnoreCase("links") => true
+        case _ => false
+      }
+      val links: Vector[Link] = linksSections.map(_.content).flatMap {
+        case List(items) => items collect { case link@Link(_, _, _) => link }
+        case _ => Vector()
+      }
+      Document(name, description, sections, links)
     }
 
   }

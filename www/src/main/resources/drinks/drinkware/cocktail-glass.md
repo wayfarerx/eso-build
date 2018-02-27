@@ -4,4 +4,4 @@ A stemmed glass with an inverted cone bowl, mainly used to serve straight-up coc
 
 ## Links
 
- - [Cocktail glass at Wikipedia](https://en.wikipedia.org/wiki/Cocktail_glass)
+- [Cocktail glass at Wikipedia](https://en.wikipedia.org/wiki/Cocktail_glass)

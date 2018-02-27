@@ -2,14 +2,14 @@
 
 A before dinner cocktail made with [rye whiskey]() and [sweet vermouth]().
 
-## Components
+## Requirements
 
+- [Cocktail glass](), chilled
 - 5 cl [rye whiskey]()
 - 2 cl [sweet vermouth]()
 - 1 dash [Angostura bitters]()
 - [Maraschino cherry]()
-- [Ice]()
-- chilled [cocktail glass]()
+- 1 cup [Ice]()
 - [Mixing glass]()
 - [Mixing spoon]()
 - [Cocktail strainer]()
@@ -20,5 +20,5 @@ Add the [whisky](rye-whiskey), [vermouth](sweet-vermouth) and [bitters](angostur
 
 ## Links
 
- - [Manhattan at International Bartenders Association](http://iba-world.com/iba-official-cocktails/manhattan/)
- - [Manhattan at Wikipedia](https://en.wikipedia.org/wiki/Manhattan_(cocktail))
+- [Manhattan at International Bartenders Association](http://iba-world.com/iba-official-cocktails/manhattan/)
+- [Manhattan at Wikipedia](https://en.wikipedia.org/wiki/Manhattan_(cocktail))

@@ -4,4 +4,4 @@ An alcoholic preparation of botanical matter characterized by a bitter or sour f
 
 ## Links
 
- - [Bitters at Wikipedia](https://en.wikipedia.org/wiki/Bitters)
+- [Bitters at Wikipedia](https://en.wikipedia.org/wiki/Bitters)

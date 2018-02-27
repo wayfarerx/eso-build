@@ -28,7 +28,7 @@ package drinks
 case class Quantity(amount: Double, unit: Quantity.Unit) {
 
   /* Return the volume and unit suffix. */
-  override def toString: String = s"$amount $unit"
+  override def toString: String = s"${if (Math.floor(amount) == amount) amount.toLong else amount} $unit"
 
 }
 
@@ -161,7 +161,7 @@ object Quantity {
   object Unit {
 
     /** The units of measure indexed by abbreviation and name. */
-    private val index: Map[String, Unit] = Seq(
+    private lazy val index: Map[String, Unit] = Seq(
       Milliliters,
       Centiliters,
       Deciliters,
