@@ -2,9 +2,7 @@ import sbt._
 
 object Dependencies {
 
-  lazy val circeCore = "io.circe" %% "circe-core" % "0.9.1"
-  lazy val circeGeneric = "io.circe" %% "circe-generic" % "0.9.1"
-  lazy val circeYaml = "io.circe" %% "circe-yaml" % "0.7.0"
+  lazy val commonsIO = "commons-io" % "commons-io" % "2.6"
   lazy val laika = "org.planet42" %% "laika-core" % "0.7.5"
   lazy val scalaTags = "com.lihaoyi" %% "scalatags" % "0.6.7"
   lazy val scalaCss = "com.github.japgolly.scalacss" %% "ext-scalatags" % "0.5.3"

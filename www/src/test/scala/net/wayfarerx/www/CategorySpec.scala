@@ -1,5 +1,5 @@
 /*
- * IndexSpec.scala
+ * CategorySpec.scala
  *
  * Copyright 2018 wayfarerx <x@wayfarerx.net> (@thewayfarerx)
  *
@@ -21,23 +21,25 @@ package net.wayfarerx.www
 import org.scalatest._
 
 /**
- * Test suite for the Index type.
+ * Test suite for the Category type.
  */
-class IndexSpec extends FlatSpec with Matchers {
+class CategorySpec extends FlatSpec with Matchers {
 
-  behavior of "Index"
+  behavior of "Category"
 
   val Parse: String => String = identity
 
+  implicit val loader: Asset.Loader = Asset.Loader(classOf[CategorySpec].getClassLoader)
+
   it should "Load resources from the classpath" in {
-    val index1 = Index[String]("index-test-1", classOf[IndexSpec].getClassLoader)(Parse)
+    val index1 = Category[String](Asset("index-test-1"))(Parse)
     index1.ids shouldBe Set(Id("mock"), Id("mocks"), Id("other-mock"))
     index1.find(Id("foo")) shouldBe None
     index1.find(Id("mock")) shouldBe Some("# Mock(s)")
     index1.find(Id("mocks")) shouldBe Some("# Mock(s)")
     index1.find(Id("other-mock")) shouldBe Some("# Other Mock")
     index1.list.toVector shouldBe Vector("# Mock(s)", "# Other Mock")
-    val index2 = Index[String]("index-test-2", classOf[IndexSpec].getClassLoader)(Parse)
+    val index2 = Category[String](Asset("index-test-2"))(Parse)
     index2.ids shouldBe Set(Id("last-mock"))
     index2.find(Id("foo")) shouldBe None
     index2.find(Id("mock")) shouldBe None
@@ -57,13 +59,13 @@ class IndexSpec extends FlatSpec with Matchers {
 
   it should "detect duplicate IDs in resources" in {
     an[IllegalStateException] should be thrownBy
-      Index[String]("index-test-3", classOf[IndexSpec].getClassLoader)(Parse)
+      Category[String](Asset("index-test-3"))(Parse)
   }
 
   it should "detect duplicate IDs in aggregations" in {
     an[IllegalStateException] should be thrownBy {
-      Index[String]("index-test-1", classOf[IndexSpec].getClassLoader)(Parse) ++
-        Index[String]("index-test-4", classOf[IndexSpec].getClassLoader)(Parse)
+      Category[String](Asset("index-test-1"))(Parse) ++
+        Category[String](Asset("index-test-4"))(Parse)
     }
   }
 

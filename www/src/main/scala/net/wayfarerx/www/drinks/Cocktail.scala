@@ -43,7 +43,7 @@ case class Cocktail(
  */
 object Cocktail {
 
-  lazy val All: Index[Cocktail] = Index[Cocktail]("drinks/cocktails") { text =>
+  lazy val All: Category[Cocktail] = Category[Cocktail](Asset("drinks/cocktails")) { text =>
     val doc = Content.Document(text)
     val headings = Set("requirements", "instructions")
     val (named, sections) = doc.sections partition {

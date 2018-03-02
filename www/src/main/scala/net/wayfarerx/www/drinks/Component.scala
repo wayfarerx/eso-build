@@ -41,7 +41,7 @@ case class Component(
 object Component {
 
   /** Repository of all known ingredients. */
-  lazy val All: Index[Component] = Seq(
+  lazy val All: Category[Component] = Seq(
     "drinkware" -> Drinkware,
     "equipment" -> Equipment,
     "fruits" -> Ingredient,
@@ -49,7 +49,7 @@ object Component {
     "spirits" -> Ingredient,
     "wines" -> Ingredient
   ) map {
-    case (path, usage) => Index[Component](s"drinks/$path") { text =>
+    case (path, usage) => Category[Component](Asset(s"drinks/$path")) { text =>
       val doc = Content.Document(text)
       Component(doc.name, doc.description, doc.sections, doc.links, usage)
     }
