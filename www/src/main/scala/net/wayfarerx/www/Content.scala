@@ -68,6 +68,29 @@ object Content {
    */
   object Inline {
 
+    /** The empty group. */
+    val Empty: Inline = Group(Vector.empty)
+
+    /**
+     * Creates an inline group with the specified members.
+     *
+     * @param members The members of the resulting group.
+     * @return An inline with the specified members.
+     */
+    def apply(members: Inline*): Inline = {
+
+      def flatten(member: Inline): Vector[Inline] = member match {
+        case Group(next) => next flatMap flatten
+        case single => Vector(single)
+      }
+
+      members.toVector flatMap flatten match {
+        case Vector() => Empty
+        case Vector(single) => single
+        case multiple => Group(multiple)
+      }
+    }
+
     /**
      * Attempts to create inline content from the specified markdown.
      *
@@ -95,36 +118,6 @@ object Content {
 
     }
 
-    /**
-     * Factory for inline groups.
-     */
-    object Group {
-
-      /** The empty group. */
-      val Empty: Group = Group(Vector.empty)
-
-      /**
-       * Creates an inline group with the specified members.
-       *
-       * @param members The members of the resulting group.
-       * @return An inline with the specified members.
-       */
-      def apply(members: Inline*): Inline = {
-
-        def flatten(member: Inline): Vector[Inline] = member match {
-          case Group(next) => next flatMap flatten
-          case single => Vector(single)
-        }
-
-        members.toVector flatMap flatten match {
-          case Vector() => Empty
-          case Vector(single) => single
-          case multiple => Group(multiple)
-        }
-      }
-
-    }
-
   }
 
   /**
@@ -142,6 +135,29 @@ object Content {
    */
   object Block {
 
+    /** The empty group. */
+    val Empty: Group = Group(Vector.empty)
+
+    /**
+     * Creates a block group with the specified members.
+     *
+     * @param members The members of the resulting group.
+     * @return A block with the specified members.
+     */
+    def apply(members: Block*): Block = {
+
+      def flatten(member: Block): Vector[Block] = member match {
+        case Group(next) => next flatMap flatten
+        case single => Vector(single)
+      }
+
+      members.toVector flatMap flatten match {
+        case Vector() => Empty
+        case Vector(single) => single
+        case multiple => Group(multiple)
+      }
+    }
+
     /**
      * Attempts to create block content from the specified markdown.
      *
@@ -155,7 +171,7 @@ object Content {
         case list@Elements.BulletList(_, _, _) => List(list)
         case wat =>
           println("WAT? --> " + wat)
-          Paragraph(Inline.Group())
+          Paragraph(Inline.Empty)
       }
 
     /**
@@ -167,36 +183,6 @@ object Content {
 
       /* Strip all members. */
       override def strip: Vector[String] = members flatMap (_.strip)
-
-    }
-
-    /**
-     * Factory for block groups.
-     */
-    object Group {
-
-      /** The empty group. */
-      val Empty: Group = Group(Vector.empty)
-
-      /**
-       * Creates a block group with the specified members.
-       *
-       * @param members The members of the resulting group.
-       * @return A block with the specified members.
-       */
-      def apply(members: Block*): Block = {
-
-        def flatten(member: Block): Vector[Block] = member match {
-          case Group(next) => next flatMap flatten
-          case single => Vector(single)
-        }
-
-        members.toVector flatMap flatten match {
-          case Vector() => Empty
-          case Vector(single) => single
-          case multiple => Group(multiple)
-        }
-      }
 
     }
 
@@ -302,13 +288,13 @@ object Content {
      */
     def apply(target: String, title: Option[String], content: Inline*): Link = {
       target.trim match {
-        case "" => Inline.Group(content: _*).stripped
+        case "" => Inline(content: _*).stripped
         case nonEmpty => nonEmpty
       }
     } match {
       case LocalPattern(id) => Local(Id(id), title, content: _*)
-      case ExternalPattern(uri) => External(new URI(uri), title, Inline.Group(content: _*))
-      case internal => Internal(Id(internal), title, Inline.Group(content: _*))
+      case ExternalPattern(uri) => External(new URI(uri), title, Inline(content: _*))
+      case internal => Internal(Id(internal), title, Inline(content: _*))
     }
 
     /**
@@ -364,7 +350,7 @@ object Content {
        * @return A local link from the specified target and content.
        */
       def apply(target: Id, content: Inline*): Local =
-        Local(target, None, Inline.Group(content: _*))
+        Local(target, None, Inline(content: _*))
 
       /**
        * Creates a local link from the specified target, title and content.
@@ -375,7 +361,7 @@ object Content {
        * @return A local link from the specified target and content.
        */
       def apply(target: Id, title: String, content: Inline*): Local =
-        Local(target, Some(title), Inline.Group(content: _*))
+        Local(target, Some(title), Inline(content: _*))
 
       /**
        * Creates a local link from the specified target, title and content.
@@ -386,7 +372,7 @@ object Content {
        * @return A local link from the specified target and content.
        */
       def apply(target: Id, title: Option[String], content: Inline*): Local =
-        Local(target, title, Inline.Group(content: _*))
+        Local(target, title, Inline(content: _*))
 
     }
 
@@ -417,7 +403,7 @@ object Content {
        * @return An internal link from the specified target and content.
        */
       def apply(target: Id, content: Inline*): Internal =
-        Internal(target, None, Inline.Group(content: _*))
+        Internal(target, None, Inline(content: _*))
 
       /**
        * Creates an internal link from the specified target, title and content.
@@ -428,7 +414,7 @@ object Content {
        * @return An internal link from the specified target and content.
        */
       def apply(target: Id, title: String, content: Inline*): Internal =
-        Internal(target, Some(title), Inline.Group(content: _*))
+        Internal(target, Some(title), Inline(content: _*))
 
       /**
        * Creates an internal link from the specified target, title and content.
@@ -439,7 +425,7 @@ object Content {
        * @return An internal link from the specified target and content.
        */
       def apply(target: Id, title: Option[String], content: Inline*): Internal =
-        Internal(target, title, Inline.Group(content: _*))
+        Internal(target, title, Inline(content: _*))
 
     }
 
@@ -470,7 +456,7 @@ object Content {
        * @return An external link from the specified target and content.
        */
       def apply(target: URI, content: Inline*): External =
-        External(target, None, Inline.Group(content: _*))
+        External(target, None, Inline(content: _*))
 
       /**
        * Creates an external link from the specified target, title and content.
@@ -481,7 +467,7 @@ object Content {
        * @return An external link from the specified target and content.
        */
       def apply(target: URI, title: String, content: Inline*): External =
-        External(target, Some(title), Inline.Group(content: _*))
+        External(target, Some(title), Inline(content: _*))
 
       /**
        * Creates an external link from the specified target, title and content.
@@ -492,7 +478,7 @@ object Content {
        * @return An external link from the specified target and content.
        */
       def apply(target: URI, title: Option[String], content: Inline*): External =
-        External(target, title, Inline.Group(content: _*))
+        External(target, title, Inline(content: _*))
 
     }
 
@@ -528,7 +514,7 @@ object Content {
      * @return A new header.
      */
     def apply(level: Int, content: Inline*): Header =
-      Header(level, Inline.Group(content: _*))
+      Header(level, Inline(content: _*))
 
     /**
      * Creates header content from header markdown.
@@ -565,7 +551,7 @@ object Content {
      * @return A new paragraph.
      */
     def apply(content: Inline*): Paragraph =
-      Paragraph(Inline.Group(content: _*))
+      Paragraph(Inline(content: _*))
 
     /**
      * Creates paragraph content from paragraph markdown.
@@ -613,7 +599,7 @@ object Content {
     private[Content] def apply(markdown: Elements.BulletList): List =
       List(markdown.content.collect {
         case Elements.BulletListItem(blocks, _, _) =>
-          Block.Group(blocks map (Block(_)): _*) match {
+          Block(blocks map (Block(_)): _*) match {
             case Paragraph(content) => content
             case other => other
           }
@@ -640,7 +626,7 @@ object Content {
   object Section {
 
     def apply(header: Header, content: Block*): Section =
-      Section(header, Block.Group(content: _*))
+      Section(header, Block(content: _*))
 
   }
 
@@ -690,12 +676,12 @@ object Content {
         case invalid => throw new IllegalArgumentException(s"Initial element was not a title: $invalid")
       }
       val description: Paragraph = astDescription match {
-        case Elements.Paragraph(spans, _) => Paragraph(Inline.Group(spans map (Inline(_)): _*))
+        case Elements.Paragraph(spans, _) => Paragraph(Inline(spans map (Inline(_)): _*))
         case invalid => throw new IllegalArgumentException(s"Secondary element was not a paragraph: $invalid")
       }
       val (linksSections, sections): (Vector[Section], Vector[Section]) = astSections map {
         case Elements.Section(Elements.Header(level, header, _), content, _) =>
-          Section(Header(level, Inline.Group(header map (Inline(_)): _*)), content map (Block(_)): _*)
+          Section(Header(level, Inline(header map (Inline(_)): _*)), content map (Block(_)): _*)
         case invalid => throw new IllegalArgumentException(s"Subsequent element was not a section: $invalid")
       } partition {
         case Section(Header(2, Text(linksHeader)), _) if linksHeader.trim.equalsIgnoreCase("links") => true

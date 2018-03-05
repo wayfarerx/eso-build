@@ -23,20 +23,24 @@ package drinks
  * Definition of a cocktail.
  *
  * @param name         The name of this cocktail.
- * @param description  The simple description of this cocktail.
+ * @param description  The description of this cocktail.
  * @param requirements The requirements for creating this cocktail.
  * @param instructions The instructions for creating this cocktail.
- * @param sections     The sections of this cocktail.
+ * @param lead         The lead of this cocktail if one is defined.
+ * @param content      The content for this cocktail.
  * @param links        The links specified by this cocktail.
  */
 case class Cocktail(
   name: Name,
-  description: Content.Paragraph,
+  description: Content.Inline,
   requirements: Vector[Cocktail.Requirement],
   instructions: Vector[Content.Block],
-  sections: Vector[Content.Section],
-  links: Vector[Content.Link]
-)
+  override val lead: Option[Content.Inline] = None,
+  override val settings: Map[String, String] = Map.empty,
+  override val content: Vector[Content.Section] = Vector.empty,
+  override val links: Vector[Content.Link] = Vector.empty,
+  override val gallery: Gallery = Gallery.empty
+) extends Topic
 
 /**
  * Repository for all cocktails.

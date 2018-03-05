@@ -1,5 +1,5 @@
 /*
- * Home.scala
+ * Drinks.scala
  *
  * Copyright 2018 wayfarerx <x@wayfarerx.net> (@thewayfarerx)
  *
@@ -17,11 +17,11 @@
  */
 
 package net.wayfarerx.www
-package home
+package drinks
 
 /**
- * Representation of the site's home page.
+ * The top-level category for drinks.
  */
-object Home {
+case class Drinks {
 
 }

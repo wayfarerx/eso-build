@@ -23,17 +23,20 @@ package drinks
  * Definition of a component of a cocktail.
  *
  * @param name        The name of this component.
- * @param description The simple description of this component.
- * @param sections    The sections of this component.
+ * @param description The description of this component.
+ * @param usage       The way in which this component is used.
  * @param links       The links specified by this component.
  */
 case class Component(
   name: Name,
   description: Content.Paragraph,
-  sections: Vector[Content.Section],
-  links: Vector[Content.Link],
-  usage: Component.Usage
-)
+  usage: Component.Usage,
+  override val lead: Option[Content.Inline] = None,
+  override val settings: Map[String, String] = Map.empty,
+  override val content: Vector[Content.Section] = Vector.empty,
+  override val links: Vector[Content.Link] = Vector.empty,
+  override val gallery: Gallery = Gallery.empty
+) extends Topic
 
 /**
  * Repository for all components.
