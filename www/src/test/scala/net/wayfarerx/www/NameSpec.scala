@@ -29,9 +29,9 @@ class NameSpec extends FlatSpec with Matchers {
 
   it should "Track, capitalize and formalize singular and plural names" in {
     val oranges = Name("fresh orange", "fresh oranges")
-    oranges.id shouldBe Id("fresh-orange")
-    oranges.alias shouldBe Some(Id("fresh-oranges"))
-    oranges.ids shouldBe Vector(Id("fresh-orange"), Id("fresh-oranges"))
+    oranges.id shouldBe Id("fresh orange")
+    oranges.alias shouldBe Some(Id("fresh oranges"))
+    oranges.ids shouldBe Vector(Id("fresh orange"), Id("fresh oranges"))
     oranges() shouldBe "fresh orange"
     oranges(0) shouldBe "fresh oranges"
     oranges(Math.PI) shouldBe "fresh oranges"

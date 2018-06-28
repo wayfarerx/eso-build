@@ -44,7 +44,6 @@ trait BaseWebsite
       val location = "/" + path.subpath(assets.getNameCount, path.getNameCount).toString.replace('\\', '/')
       location -> Asset(location, Files.probeContentType(path))(() => Files.readAllBytes(path))
     }.toMap finally stream.close()
-    println(v)
     v
   }
 

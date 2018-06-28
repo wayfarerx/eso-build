@@ -27,19 +27,28 @@ package drinks
  * @param requirements The requirements for creating this cocktail.
  * @param instructions The instructions for creating this cocktail.
  * @param lead         The lead of this cocktail if one is defined.
+ * @param settings     Any settings defined on the topic.
  * @param content      The content for this cocktail.
  * @param links        The links specified by this cocktail.
+ * @param gallery      The gallery of images associated with this cocktail.
+ * @param staticSubtopics      The static subtopics indexed by their ID.
+ * @param dynamicSubtopicIds   A function that produces the IDs of the dynamic subtopics.
+ * @param dynamicSubtopicValue A function that attempts to produce a dynamic subtopic with the specified ID.
  */
 case class Cocktail(
   name: Name,
   description: Content.Inline,
   requirements: Vector[Cocktail.Requirement],
-  instructions: Vector[Content.Block],
+  instructions: Content.Block,
   override val lead: Option[Content.Inline] = None,
   override val settings: Map[String, String] = Map.empty,
   override val content: Vector[Content.Section] = Vector.empty,
   override val links: Vector[Content.Link] = Vector.empty,
   override val gallery: Gallery = Gallery.empty
+)(
+  override protected val staticSubtopics: Map[Id, Topic] = Map.empty,
+  override protected val dynamicSubtopicIds: () => Vector[Id] = () => Vector.empty,
+  override protected val dynamicSubtopicValue: Id => Option[Topic] = _ => None
 ) extends Topic
 
 /**
@@ -47,6 +56,7 @@ case class Cocktail(
  */
 object Cocktail {
 
+  /*
   lazy val All: Category[Cocktail] = Category[Cocktail](Asset("drinks/cocktails")) { text =>
     val doc = Content.Document(text)
     val headings = Set("requirements", "instructions")
@@ -74,6 +84,7 @@ object Cocktail {
       (s => Vector(s.content)) getOrElse Vector()
     Cocktail(doc.name, doc.description, requirements, instructions, sections, doc.links)
   }
+  */
 
   /**
    * A single requirement for a cocktail.

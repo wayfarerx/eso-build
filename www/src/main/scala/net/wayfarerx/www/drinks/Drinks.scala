@@ -22,6 +22,6 @@ package drinks
 /**
  * The top-level category for drinks.
  */
-case class Drinks {
+case object Drinks {
 
 }

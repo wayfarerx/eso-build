@@ -1,0 +1,3 @@
+# Cocktails
+
+Alcoholic beverages.

@@ -22,20 +22,31 @@ package drinks
 /**
  * Definition of a component of a cocktail.
  *
- * @param name        The name of this component.
- * @param description The description of this component.
- * @param usage       The way in which this component is used.
- * @param links       The links specified by this component.
+ * @param name                 The name of this component.
+ * @param description          The description of this component.
+ * @param usage                The way in which this component is used.
+ * @param lead                 The lead of this component if one is defined.
+ * @param settings             Any settings defined on this component.
+ * @param content              The markup content of this component.
+ * @param links                The links specified by this component.
+ * @param gallery              The gallery of images associated with this component.
+ * @param staticSubtopics      The static subtopics indexed by their ID.
+ * @param dynamicSubtopicIds   A function that produces the IDs of the dynamic subtopics.
+ * @param dynamicSubtopicValue A function that attempts to produce a dynamic subtopic with the specified ID.
  */
 case class Component(
   name: Name,
-  description: Content.Paragraph,
+  description: Content.Inline,
   usage: Component.Usage,
   override val lead: Option[Content.Inline] = None,
   override val settings: Map[String, String] = Map.empty,
   override val content: Vector[Content.Section] = Vector.empty,
   override val links: Vector[Content.Link] = Vector.empty,
   override val gallery: Gallery = Gallery.empty
+)(
+  override protected val staticSubtopics: Map[Id, Topic] = Map.empty,
+  override protected val dynamicSubtopicIds: () => Vector[Id] = () => Vector.empty,
+  override protected val dynamicSubtopicValue: Id => Option[Topic] = _ => None
 ) extends Topic
 
 /**
@@ -43,7 +54,7 @@ case class Component(
  */
 object Component {
 
-  /** Repository of all known ingredients. */
+  /* Repository of all known ingredients.
   lazy val All: Category[Component] = Seq(
     "drinkware" -> Drinkware,
     "equipment" -> Equipment,
@@ -56,7 +67,7 @@ object Component {
       val doc = Content.Document(text)
       Component(doc.name, doc.description, doc.sections, doc.links, usage)
     }
-  } reduce (_ ++ _)
+  } reduce (_ ++ _)*/
 
   /**
    * Base type for the usage categories.

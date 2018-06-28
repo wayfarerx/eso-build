@@ -19,9 +19,11 @@
 package net.wayfarerx.www
 
 /**
- * The unique ID used for all top-level content.
+ * The ID used to identify things in various scopes.
+ *
+ * @param value The value of this ID.
  */
-final class Id private(val value: String) extends AnyVal {
+final class Id(val value: String) extends AnyVal {
 
   /* Use the value as the string form. */
   override def toString: String = value
@@ -29,24 +31,16 @@ final class Id private(val value: String) extends AnyVal {
 }
 
 /**
- * Factory for content IDs.
+ * Factory for IDs.
  */
 object Id {
 
   /**
-   * Creates a new ID by normalizing the specified string.
+   * Creates a new ID.
    *
-   * @param value The value to normalize and use as an ID.
-   * @return The normalized ID.
+   * @param value The value of the ID.
+   * @return A new ID.
    */
-  def apply(value: String): Id = new Id(
-    java.text.Normalizer.normalize(value, java.text.Normalizer.Form.NFD)
-      .replaceAll("""[^\p{ASCII}]+""", "")
-      .replaceAll("""[\`\'\"\(\)\[\]\{\}\<\>]+""", "")
-      .replaceAll("""[^a-zA-Z0-9]+""", "-")
-      .replaceAll("""^[\-]+""", "")
-      .replaceAll("""[\-]+$""", "")
-      .toLowerCase
-  )
+  def apply(value: String): Id = new Id(value)
 
 }
